@@ -1,0 +1,157 @@
+{
+  "hero": {
+    "title": "Personal Cloud,",
+    "subtitle": "reimagined.",
+    "finalTitle": "Your Data, Your Control",
+    "finalSubtitle": "Secure, private, and always accessible",
+    "image": "/laptop.png"
+  },
+  "dataConnect": {
+    "title": "Connect all of your precious data",
+    "description": "No more splitting data on Dropbox, Google Drive, or hard drives. Keep your data both updated and safe. Easily sync between devices and manage backups.",
+    "features": [
+      {
+        "title": "10X",
+        "subtitle": "Syncing speed"
+      },
+      {
+        "title": "ZERO",
+        "subtitle": "data traffic or subscription fee"
+      },
+      {
+        "title": "Multi-device",
+        "subtitle": "access via phone, TV or VR"
+      }
+    ],
+    "image": "/laptop.png"
+  },
+  "carousel": [
+    {
+      "title": "DHCP Leases",
+      "description": "View and manage active DHCP leases on your network",
+      "imageSrc": "/active_dhcp_leases.png"
+    },
+    {
+      "title": "Bandwidth Statistics",
+      "description": "Monitor network bandwidth usage and trends",
+      "imageSrc": "/bandwidth_stats.png"
+    }
+  ],
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Here are some frequently asked questions we have answered quickly for you.",
+    "items": [
+      {
+        "question": "What is DarkFlows?",
+        "answer": "DarkFlows is a powerful data integration and workflow automation platform that helps you connect and manage your data seamlessly."
+      },
+      {
+        "question": "Is DarkFlows free to use?",
+        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
+      },
+      {
+        "question": "How secure is my data with DarkFlows?",
+        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
+      },
+      {
+        "question": "Can I integrate DarkFlows with my existing tools?",
+        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
+      },
+      {
+        "question": "Is DarkFlows free to use?",
+        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
+      },
+      {
+        "question": "How secure is my data with DarkFlows?",
+        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
+      },
+      {
+        "question": "Can I integrate DarkFlows with my existing tools?",
+        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
+      },
+      {
+        "question": "Is DarkFlows free to use?",
+        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
+      },
+      {
+        "question": "How secure is my data with DarkFlows?",
+        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
+      },
+      {
+        "question": "Can I integrate DarkFlows with my existing tools?",
+        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
+      },
+      {
+        "question": "Do you offer technical support?",
+        "answer": "Yes, we provide comprehensive technical support through our documentation, community forums, and dedicated support team for premium users."
+      }
+    ]
+  },
+  "footer": {
+    "sections": [
+      {
+        "title": "Product",
+        "links": [
+          { "text": "Windsurf Editor", "href": "/windsurf-editor" },
+          { "text": "Supercomplete", "href": "/supercomplete" },
+          { "text": "Live", "href": "/live" },
+          { "text": "Forge", "href": "/forge" },
+          { "text": "Pricing", "href": "/pricing" },
+          { "text": "Enterprise", "href": "/enterprise" },
+          { "text": "Offers", "href": "/offers" }
+        ]
+      },
+      {
+        "title": "Extensions",
+        "links": [
+          { "text": "Visual Studio Code", "href": "/vscode" },
+          { "text": "JetBrains", "href": "/jetbrains" },
+          { "text": "Neovim / Vim", "href": "/vim" },
+          { "text": "Chrome", "href": "/chrome" },
+          { "text": "See All", "href": "/extensions" }
+        ]
+      },
+      {
+        "title": "Industry",
+        "links": [
+          { "text": "Tech Leaders 2024", "href": "/tech-leaders" }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          { "text": "About Us", "href": "/about" },
+          { "text": "Blog", "href": "/blog" },
+          { "text": "Careers", "href": "/careers" },
+          { "text": "Compare", "href": "/compare" },
+          { "text": "Contact", "href": "/contact" },
+          { "text": "Community", "href": "/community" },
+          { "text": "Partnerships", "href": "/partnerships" }
+        ]
+      },
+      {
+        "title": "Resources",
+        "links": [
+          { "text": "Support", "href": "/support" },
+          { "text": "Docs", "href": "/docs" },
+          { "text": "Changelog", "href": "/changelog" },
+          { "text": "FAQ", "href": "/faq" },
+          { "text": "Feature Requests", "href": "/feature-requests" },
+          { "text": "Events", "href": "/events" },
+          { "text": "Media Kit", "href": "/media-kit" },
+          { "text": "University", "href": "/university" },
+          { "text": "Hackathons", "href": "/hackathons" }
+        ]
+      }
+    ],
+    "socials": [
+      { "platform": "email", "href": "#", "icon": "envelope" },
+      { "platform": "twitter", "href": "#", "icon": "twitter" },
+      { "platform": "discord", "href": "#", "icon": "discord" },
+      { "platform": "linkedin", "href": "#", "icon": "linkedin" },
+      { "platform": "reddit", "href": "#", "icon": "reddit" },
+      { "platform": "youtube", "href": "#", "icon": "youtube" }
+    ],
+    "tagline": "Your modern coding superpowers."
+  }
+} 

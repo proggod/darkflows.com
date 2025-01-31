@@ -24,11 +24,8 @@ b. Create a new repository: darkflows-web
 c. Login to Docker Hub:
    $ docker login
 
-d. Tag your image:
-   $ docker build -t delusions0/darkflows-web:latest .
-   
-e. Push to Docker Hub:
-   $ docker push delusions0/darkflows-web:latest
+d. Build and push multi-platform image:
+   $ ./build.sh
 
 
 3. Server Deployment

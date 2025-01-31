@@ -134,6 +134,28 @@
       {
         "question": "Why put applications and file sharing on the same system?",
         "answer": "For most people having one system to rule them all is the best solution.  We have designed DarkFlows to be a very light weight OS that can run on a very inexpensive system and still provide all the features you need."
+      },
+      {
+        "question": "What do I do before installing DarkFlows?",
+        "answer": "Make sure you have your WAN and LAN ports set up before installing DarkFlows.  Our installer auto detects your network configuration and will configure your system accordingly."
+      },
+      {
+        "question": "How do I access the DarkFlows dashboard?",
+        "answer": "You can just visit the default IP address at http://192.168.58.1/ to access the dashboard.  It will then redirect you to port 4080."
+      },
+      {
+        "question": "What are the default passwords and usernames?",
+        "answer": "The default password for root and other things is 'darkflows'.  There is also a default user added called 'darkflows'."
+      }
+      ,
+      {
+        "question": "Can I access SSH?",
+        "answer": "SSH is enabled on port 12222 on both the WAN and LAN interfaces."
+      }
+      ,
+      {
+        "question": "Can I access the web interface from the internet?",
+        "answer": "By default the web interface is only accessible from the local network.  It is not recommended to expose the web interface to the internet at this time until we add additional security measures for user authentication."
       }
     ]
   },

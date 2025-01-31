@@ -12,6 +12,7 @@ export interface Feature {
 }
 
 export interface DataConnectSection {
+  id: string;
   title: string;
   description: string;
   features: Feature[];
@@ -59,7 +60,7 @@ interface Footer {
 
 export interface SiteContent {
   hero: HeroSection;
-  dataConnect: DataConnectSection;
+  dataConnectSections: DataConnectSection[];
   carousel: CarouselItem[];
   faq: FAQ;
   footer: Footer;

@@ -1,11 +1,85 @@
 {
   "hero": {
-    "title": "Personal Cloud,",
-    "subtitle": "reimagined.",
-    "finalTitle": "Your Data, Your Control",
-    "finalSubtitle": "Secure, private, and always accessible",
+    "title": "DarkFlows Router OS",
+    "subtitle": "High Performance Routing and Firewalling Reimagined",
+    "finalTitle": "Powerful and Easy to Use",
+    "finalSubtitle": "Latency free gaming, high performance traffic shaping, and easy to use dashboard",
     "image": "/laptop.png"
   },
+  "dataConnectSections": [
+    {
+      "id": "data-section-1",
+      "title": "Fully Customizable Dashboard",
+      "description": "Easily hide and re-arrange the widgets to always have the perfect view of your network.",
+      "features": [
+        {
+          "title": "App Store",
+          "subtitle": "Install additional widgets from the App Store or with Docker"
+        },
+        {
+          "title": "Kiosk Mode",
+          "subtitle": "Use Kiosk mode to display a custom dashboard on your wall"
+        },
+        {
+          "title": "Network Monitoring",
+          "subtitle": "See at all time what is happening on your network"
+        }
+      ],
+      "image": "/custom.png"
+    },
+    {
+      "id": "data-section-2",
+      "title": "High Performance Traffic Shaping",
+      "description": "Thanks to CAKE and the Linux Kernel, you can shape your traffic with the highest possible performance",
+      "features": [
+        {
+          "title": "Linux Kernel",
+          "subtitle": "Higher Performance then BSD based solutions with more compatibility"
+        },
+        {
+          "title": "No more bufferbloat",
+          "subtitle": "CAKE is the only solution that can shape traffic with zero latency added under high load"
+        },
+        {
+          "title": "Gaming Performance",
+          "subtitle": "Stop jitter and lag during gaming sessions, CAKE is the only bullet proof solution"
+        }
+      ],
+      "image": "/cake.png"
+    },
+    {
+      "id": "data-section-3",
+      "title": "No more Ads",
+      "description": "Thanks to Pi-Hole we block all ads at the DNS level.  Easily manage your DNS from our dashboard.",
+      "features": [
+        {
+          "title": "Built in Management",
+          "subtitle": "Pi-Hole Admin is accessible however you don't even need to leave our dashboard"
+        },
+        {
+          "title": "Cooperative Naming",
+          "subtitle": "Using DNS and DHCP data we can name and trace clients on your network"
+        }
+      ],
+      "image": "/pihole.png"
+    },
+    {
+      "id": "data-section-4",
+      "title": "Easy NAS Storage",
+      "description": "Easily manage your NAS storage with our built in Samba server.  Share files between your devices and work together on the same documents.",
+      "features": [
+        {
+          "title": "Add additional storage",
+          "subtitle": "Leverage ZFS and RAID to add additional storage to your network"
+        },
+        {
+          "title": "Easy Management",
+          "subtitle": "Easily add shares, users, and groups to your Samba server"
+        }
+      ],
+      "image": "/samba_image.png"
+    }
+  ],
   "dataConnect": {
     "title": "Connect all of your precious data",
     "description": "No more splitting data on Dropbox, Google Drive, or hard drives. Keep your data both updated and safe. Easily sync between devices and manage backups.",
@@ -43,47 +117,23 @@
     "items": [
       {
         "question": "What is DarkFlows?",
-        "answer": "DarkFlows is a powerful data integration and workflow automation platform that helps you connect and manage your data seamlessly."
+        "answer": "On a Mission to make the best router OS for the home we decided to create the solution to solve our own problems.  We wanted to create a router OS that was easy to use, had all the features we needed, and ultimately solve all our traffic shaping needs."
       },
       {
         "question": "Is DarkFlows free to use?",
-        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
+        "answer": "DarkFlows is free to use and our intent is to keep it that way."
       },
       {
-        "question": "How secure is my data with DarkFlows?",
-        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
+        "question": "Why is CAKE better then solutions on pfSense and OPNsense?",
+        "answer": "CAKE was made to fix all network bufferbloat issues that plague other solutions.  It is the only solution that can shape traffic with zero latency added under high load."
       },
       {
-        "question": "Can I integrate DarkFlows with my existing tools?",
-        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
+        "question": "How can I install DarkFlows?",
+        "answer": "There are two ways to install DarkFlows.  You can use our pre-built ISO images or run our installer script on a Debian based system."
       },
       {
-        "question": "Is DarkFlows free to use?",
-        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
-      },
-      {
-        "question": "How secure is my data with DarkFlows?",
-        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
-      },
-      {
-        "question": "Can I integrate DarkFlows with my existing tools?",
-        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
-      },
-      {
-        "question": "Is DarkFlows free to use?",
-        "answer": "DarkFlows offers both free and premium tiers. The free tier includes essential features, while premium plans offer advanced capabilities and increased usage limits."
-      },
-      {
-        "question": "How secure is my data with DarkFlows?",
-        "answer": "We take security seriously. All data is encrypted in transit and at rest, and we employ industry-standard security practices to protect your information."
-      },
-      {
-        "question": "Can I integrate DarkFlows with my existing tools?",
-        "answer": "Yes! DarkFlows supports integration with many popular tools and platforms, and our API allows for custom integrations as well."
-      },
-      {
-        "question": "Do you offer technical support?",
-        "answer": "Yes, we provide comprehensive technical support through our documentation, community forums, and dedicated support team for premium users."
+        "question": "Why put applications and file sharing on the same system?",
+        "answer": "For most people having one system to rule them all is the best solution.  We have designed DarkFlows to be a very light weight OS that can run on a very inexpensive system and still provide all the features you need."
       }
     ]
   },

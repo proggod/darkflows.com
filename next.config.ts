@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  // Add Turbopack configuration
+  experimental: {
+    turbo: {
+      rules: {
+        // Configure SVG handling for Turbopack
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+        },
+      },
+    },
+  },
 };
 
 export default nextConfig;

@@ -73,16 +73,20 @@ const VideoTutorials = () => {
             }
         )
 
-        if (videoRef.current) {
-            observer.observe(videoRef.current)
+        // Store the current value of the ref in a variable
+        const currentRef = videoRef.current
+
+        if (currentRef) {
+            observer.observe(currentRef)
         }
 
         return () => {
-            if (videoRef.current) {
-                observer.unobserve(videoRef.current)
+            // Use the stored value in cleanup
+            if (currentRef) {
+                observer.unobserve(currentRef)
             }
         }
-    }, [activeVideo]) // Added activeVideo to dependencies to handle video changes
+    }, [activeVideo]) // Added activeVideo to dependencies
 
     return (
         <div className={styles.container}>

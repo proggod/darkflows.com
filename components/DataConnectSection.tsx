@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { DataConnectSection as DataConnectType } from '@/types';
+import Image from 'next/image';
 
 interface Props {
   data: DataConnectType;
   sectionId: string;
+  imageOnRight?: boolean;
 }
 
-const DataConnectSection = ({ data, sectionId }: Props) => {
+const DataConnectSection = ({ data, sectionId, imageOnRight = true }: Props) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,15 +31,17 @@ const DataConnectSection = ({ data, sectionId }: Props) => {
   return (
     <div id={sectionId} className="py-12 bg-black">
       <div className="max-w-7xl mx-auto px-6 md:px-4 flex flex-col lg:flex-row items-center">
-        {/* Left content */}
-        <div className="w-full lg:w-1/2 space-y-8 px-4 lg:px-0">
+        {/* Content section */}
+        <div className={`w-full lg:w-1/2 space-y-8 px-4 lg:px-0 ${
+          imageOnRight ? 'lg:pr-8' : 'lg:pl-8 lg:order-2'
+        }`}>
           <h2 className={`text-4xl md:text-6xl font-bold text-white transform transition-all duration-1000 
-            ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-32 opacity-0'}`}>
+            ${isVisible ? 'translate-x-0 opacity-100' : `${imageOnRight ? '-translate-x-32' : 'translate-x-32'} opacity-0`}`}>
             {data.title}
           </h2>
           
           <p className={`text-gray-300 text-lg md:text-xl transform transition-all duration-1000 delay-200
-            ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-32 opacity-0'}`}>
+            ${isVisible ? 'translate-x-0 opacity-100' : `${imageOnRight ? '-translate-x-32' : 'translate-x-32'} opacity-0`}`}>
             {data.description}
           </p>
 
@@ -46,7 +50,7 @@ const DataConnectSection = ({ data, sectionId }: Props) => {
               <div 
                 key={item.title}
                 className={`transform transition-all duration-1000 delay-[${(index + 2) * 200}ms]
-                  ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-32 opacity-0'}`}
+                  ${isVisible ? 'translate-x-0 opacity-100' : `${imageOnRight ? '-translate-x-32' : 'translate-x-32'} opacity-0`}`}
               >
                 <div className="text-2xl md:text-3xl font-bold text-white">
                   {item.title}
@@ -59,14 +63,19 @@ const DataConnectSection = ({ data, sectionId }: Props) => {
           </div>
         </div>
 
-        {/* Right content - Image */}
-        <div className="w-full lg:w-1/2 mt-12 lg:mt-0">
+        {/* Image section */}
+        <div className={`w-full lg:w-1/2 mt-12 lg:mt-0 ${
+          imageOnRight ? 'lg:order-2' : 'lg:order-1'
+        }`}>
           <div className={`transform transition-all duration-1000 delay-500
-            ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-32 opacity-0'}`}>
-            <img
+            ${isVisible ? 'translate-x-0 opacity-100' : `${imageOnRight ? 'translate-x-32' : '-translate-x-32'} opacity-0`}`}>
+            <Image
               src={data.image}
-              alt="Laptop Display"
+              alt="Feature illustration"
+              width={600}
+              height={400}
               className="w-full h-auto object-contain"
+              priority={false}
             />
           </div>
         </div>

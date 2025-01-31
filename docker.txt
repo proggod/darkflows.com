@@ -1,0 +1,122 @@
+DarkFlows Docker Deployment Guide
+===============================
+
+1. Local Development Setup
+------------------------
+a. Create required files in your project root:
+   - Dockerfile
+   - docker-compose.yml
+   - .dockerignore
+
+b. Build and test locally:
+   $ docker-compose up --build
+   Visit http://localhost:3050 to verify
+
+c. Stop the container:
+   $ docker-compose down
+
+
+2. Docker Hub Setup
+------------------
+a. Create Docker Hub account at https://hub.docker.com/
+b. Create a new repository: darkflows-web
+
+c. Login to Docker Hub:
+   $ docker login
+
+d. Tag your image:
+   $ docker build -t yourusername/darkflows-web:latest .
+   
+e. Push to Docker Hub:
+   $ docker push yourusername/darkflows-web:latest
+
+
+3. Server Deployment
+------------------
+a. SSH into your server:
+   $ ssh user@your-server-ip
+
+b. Install Docker and Docker Compose if not installed:
+   $ sudo apt update
+   $ sudo apt install docker.io docker-compose
+   $ sudo systemctl enable docker
+   $ sudo systemctl start docker
+
+c. Create deployment directory:
+   $ mkdir -p ~/darkflows
+   $ cd ~/darkflows
+
+d. Create docker-compose.yml:
+   Copy the docker-compose.yml content to the server
+
+e. Pull and run:
+   $ docker-compose pull
+   $ docker-compose up -d
+
+f. Check logs if needed:
+   $ docker-compose logs -f
+
+
+4. Maintenance Commands
+---------------------
+- Update to latest version:
+  $ docker-compose pull
+  $ docker-compose up -d
+
+- View container status:
+  $ docker-compose ps
+
+- View logs:
+  $ docker-compose logs -f
+
+- Restart containers:
+  $ docker-compose restart
+
+- Stop containers:
+  $ docker-compose down
+
+- Remove all containers and images:
+  $ docker-compose down --rmi all
+
+
+5. Troubleshooting
+----------------
+- Check container status:
+  $ docker ps -a
+
+- View detailed container info:
+  $ docker inspect container_name
+
+- View container logs:
+  $ docker logs container_name
+
+- Access container shell:
+  $ docker exec -it container_name /bin/sh
+
+- Check container resource usage:
+  $ docker stats
+
+- Verify network connectivity:
+  $ docker network ls
+  $ docker network inspect network_name
+
+
+6. Security Notes
+---------------
+- Always use the non-root user specified in Dockerfile
+- Keep Docker and packages updated
+- Use specific version tags instead of 'latest' in production
+- Regularly update security patches
+- Monitor container logs for suspicious activity
+- Use Docker secrets for sensitive data
+- Enable Docker's built-in security features
+
+Remember to replace:
+- yourusername with your Docker Hub username
+- your-server-ip with your actual server IP
+- container_name with your actual container name
+
+For this specific Next.js application, ensure:
+1. next.config.ts has output: 'standalone' enabled
+2. Port 3050 is open on your server firewall
+3. Environment variables are properly configured 

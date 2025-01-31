@@ -15,10 +15,10 @@ export default function Home() {
       <TopNavBar />
       <ScrollReveal data={content.hero} />
       <div className="space-y-2">
-        <DataConnectSection data={content.dataConnect} sectionId="data-section-1" />
-        <DataConnectSection data={content.dataConnect} sectionId="data-section-2" />
-        <DataConnectSection data={content.dataConnect} sectionId="data-section-3" />
-        <DataConnectSection data={content.dataConnect} sectionId="data-section-4" />
+        <DataConnectSection data={content.dataConnect} sectionId="data-section-1" imageOnRight={true} />
+        <DataConnectSection data={content.dataConnect} sectionId="data-section-2" imageOnRight={false} />
+        <DataConnectSection data={content.dataConnect} sectionId="data-section-3" imageOnRight={true} />
+        <DataConnectSection data={content.dataConnect} sectionId="data-section-4" imageOnRight={false} />
       </div>
       <div>
         <FeatureCarousel />

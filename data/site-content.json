@@ -147,9 +147,9 @@
     "socials": [
       { "platform": "email", "href": "#", "icon": "envelope" },
       { "platform": "twitter", "href": "#", "icon": "twitter" },
-      { "platform": "discord", "href": "#", "icon": "discord" },
+      { "platform": "discord", "href": "https://discord.gg/3QmjpqX2Y5", "icon": "discord" },
       { "platform": "linkedin", "href": "#", "icon": "linkedin" },
-      { "platform": "reddit", "href": "#", "icon": "reddit" },
+      { "platform": "reddit", "href": "https://www.reddit.com/r/DarkFlows/", "icon": "reddit" },
       { "platform": "youtube", "href": "#", "icon": "youtube" }
     ],
     "tagline": "Your modern coding superpowers."

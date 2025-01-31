@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { HeroSection } from '@/types';
+import Image from 'next/image';
 
 interface Props {
   data: HeroSection;
@@ -54,9 +55,11 @@ const ScrollReveal = ({ data }: Props) => {
                 opacity: Math.min(scrollPosition / 100, 1)
               }}
             >
-              <img
+              <Image
                 src={data.image}
                 alt="Laptop Display"
+                width={900}
+                height={600}
                 className="w-full h-auto object-contain transition-transform duration-500 bg-transparent"
                 style={{
                   transform: `translateY(${scrollPosition > 50 ? 0 : 100}px)`,

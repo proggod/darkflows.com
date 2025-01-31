@@ -25,7 +25,7 @@ interface FooterProps {
   };
 }
 
-const socialIcons: { [key: string]: React.ComponentType } = {
+const socialIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
   envelope: FaEnvelope,
   twitter: FaTwitter,
   discord: FaDiscord,

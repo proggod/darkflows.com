@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import Image from 'next/image';
 
 interface CarouselItem {
   title: string;
@@ -203,13 +204,19 @@ const FeatureCarousel = () => {
                       }}
                     >
                       <div className="rounded-lg overflow-hidden">
-                        <div className="relative h-[400px] flex items-center justify-center">
-                          <img
+                        <div 
+                          className="relative w-full flex items-center justify-center cursor-pointer"
+                          onClick={() => openModal(item)}
+                        >
+                          <Image
                             src={item.imageSrc}
                             alt={item.title}
-                            className="max-w-full max-h-full object-contain cursor-pointer hover:opacity-90 transition-opacity pointer-events-none"
-                            onClick={() => openModal(item)}
+                            width={800}
+                            height={600}
+                            className="w-full h-auto object-contain rounded-lg hover:opacity-90 transition-opacity"
+                            priority={false}
                             draggable={false}
+                            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                           />
                         </div>
                         <div className="text-center">
@@ -272,11 +279,13 @@ const FeatureCarousel = () => {
               <X size={32} />
             </button>
             <div className="flex flex-col items-center h-full overflow-y-auto py-4">
-              <img
+              <Image
                 src={selectedImage.imageSrc}
                 alt={selectedImage.title}
-                className="max-w-full max-h-[65vh] object-contain mb-6"
-                onClick={(e) => e.stopPropagation()}
+                width={1200}
+                height={800}
+                className="max-w-full max-h-[90vh] object-contain"
+                priority={true}
               />
               <div 
                 className="text-center w-full pb-4"

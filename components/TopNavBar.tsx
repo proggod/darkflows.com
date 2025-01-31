@@ -3,6 +3,7 @@
 import React from "react"
 import Link from 'next/link'
 import Image from 'next/image'
+import { FaDiscord, FaReddit } from 'react-icons/fa';
 
 // Main NavBar component
 export default function TopNavBar() {
@@ -36,17 +37,22 @@ export default function TopNavBar() {
         <div className="fixed top-2 right-4 z-50 flex items-center gap-2">
           {/* Discord Icon */}
           <Link 
-            href="https://discord.gg/your-server" 
+            href="https://discord.gg/3QmjpqX2Y5" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:opacity-80 transition-opacity"
+            className="text-gray-400 hover:text-white transition-colors"
           >
-            <Image 
-              src="/discord-icon.svg" 
-              alt="Discord" 
-              width={24} 
-              height={24}
-            />
+            <FaDiscord size={24} />
+          </Link>
+
+          {/* Reddit Icon */}
+          <Link 
+            href="https://www.reddit.com/r/DarkFlows/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <FaReddit size={24} />
           </Link>
 
           {/* Support Button */}

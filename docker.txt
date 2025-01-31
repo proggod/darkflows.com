@@ -25,10 +25,10 @@ c. Login to Docker Hub:
    $ docker login
 
 d. Tag your image:
-   $ docker build -t yourusername/darkflows-web:latest .
+   $ docker build -t delusions0/darkflows-web:latest .
    
 e. Push to Docker Hub:
-   $ docker push yourusername/darkflows-web:latest
+   $ docker push delusions0/darkflows-web:latest
 
 
 3. Server Deployment

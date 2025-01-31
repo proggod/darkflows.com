@@ -6,6 +6,7 @@ import FAQ from '@/components/FAQ';
 import Footer from '@/components/Footer';
 import siteContent from '@/data/site-content.json';
 import { SiteContent } from '@/types';
+import VideoTutorials from './components/VideoTutorials'
 
 export default function Home() {
   const content = siteContent as SiteContent;
@@ -23,6 +24,7 @@ export default function Home() {
       <div>
         <FeatureCarousel />
       </div>
+      <VideoTutorials />
       <FAQ data={content.faq} />
       <Footer data={content.footer} />
     </main>

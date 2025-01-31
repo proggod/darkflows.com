@@ -29,7 +29,7 @@ COPY --from=builder /app/.next/static ./.next/static
 USER node
 
 EXPOSE 3050
-ENV PORT 3050
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3050
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"] 

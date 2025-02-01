@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
+<<<<<<< HEAD
     "build": "set NODE_OPTIONS=--no-deprecation && next build",
+=======
+    "build": "next build",
+>>>>>>> 708a760c631c9217862e50a931a9615ee42f959b
     "start": "next start -p 3050",
     "lint": "next lint"
   },

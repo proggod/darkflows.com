@@ -24,6 +24,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload the main laptop image */}
+        <link
+          rel="preload"
+          href="/laptop.png"
+          as="image"
+          type="image/png"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

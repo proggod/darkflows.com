@@ -1,35 +1,36 @@
-# Base node image
-FROM node:20-alpine AS base
+# Build stage
+FROM node:18-alpine AS builder
+
 WORKDIR /app
-
-# Dependencies stage
-FROM base AS deps
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm ci
-
-# Builder stage
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# Runner stage
-FROM base AS runner
-ENV NODE_ENV=production
+# Production stage
+FROM node:18-alpine AS runner
 
-# Create app directory
 WORKDIR /app
 
-# Copy necessary files
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3050
+ENV HOSTNAME="0.0.0.0"
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Copy necessary files from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Set user for security
-USER node
-
+# Expose the port
 EXPOSE 3050
-ENV PORT=3050
-ENV HOSTNAME="0.0.0.0"
 
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+# Start the server with explicit host binding
 CMD ["node", "server.js"] 

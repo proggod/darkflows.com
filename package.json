@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "next build",
-    "start": "next start",
+    "build": "set NODE_OPTIONS=--no-deprecation && next build",
+    "start": "next start -p 3050",
     "lint": "next lint"
   },
   "dependencies": {

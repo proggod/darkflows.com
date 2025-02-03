@@ -42,12 +42,49 @@ const ScrollReveal = ({ data }: Props) => {
             <p className="text-xl md:text-2xl text-gray-300">
               {data.subtitle}
             </p>
+
+            {/* New scroll indicator */}
+            <div 
+              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-center animate-bounce"
+              style={{
+                opacity: scrollPosition < 10 ? 1 : 0,
+                transition: 'opacity 0.5s ease-in-out'
+              }}
+            >
+              <p className="text-gray-400 mb-2">Scroll Down</p>
+              <div className="flex flex-col items-center gap-1">
+                <svg 
+                  className="w-6 h-6 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                  />
+                </svg>
+                <svg 
+                  className="w-6 h-6 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                  />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* Laptop image container */}
-          <div 
-            className="absolute inset-0 flex items-center justify-center bg-transparent"
-          >
+          <div className="absolute inset-0 flex items-center justify-center bg-transparent">
             <div
               className="relative w-full max-w-[900px] transition-all duration-500 bg-transparent"
               style={{
@@ -60,11 +97,52 @@ const ScrollReveal = ({ data }: Props) => {
                 alt="Laptop Display"
                 width={900}
                 height={600}
+                priority={true}
+                loading="eager"
                 className="w-full h-auto object-contain transition-transform duration-500 bg-transparent"
                 style={{
                   transform: `translateY(${scrollPosition > 50 ? 0 : 100}px)`,
                 }}
               />
+
+              {/* Second scroll indicator - appears with laptop */}
+              <div 
+                className="absolute -bottom-32 left-1/2 -translate-x-1/2 text-center animate-bounce"
+                style={{
+                  opacity: scrollPosition > 33 && scrollPosition < 66 ? 1 : 0,
+                  transition: 'opacity 0.5s ease-in-out'
+                }}
+              >
+                <p className="text-gray-400 mb-2">Keep Scrolling</p>
+                <div className="flex flex-col items-center gap-1">
+                  <svg 
+                    className="w-6 h-6 text-gray-400" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                    />
+                  </svg>
+                  <svg 
+                    className="w-6 h-6 text-gray-400" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 

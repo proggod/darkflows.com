@@ -8,11 +8,21 @@ rm -rf .next
 rm -rf node_modules
 
 echo "📦 Installing dependencies..."
-npm ci
+# Remove package-lock.json if it exists
+rm -f package-lock.json
+# Run npm install instead of npm ci to generate a new package-lock.json
+npm install
 
 echo "🔧 Setting up builder..."
 docker buildx create --name darkflows-builder --use || true
 docker buildx inspect --bootstrap
+
+# Add environment check and file
+echo "📝 Checking environment files..."
+if [ ! -f .env.production ]; then
+    echo "⚠️  .env.production file not found. Creating from example..."
+    cp .env.example .env.production
+fi
 
 echo "🏗️ Building amd64 image..."
 docker buildx build \

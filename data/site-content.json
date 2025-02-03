@@ -157,6 +157,30 @@
         "question": "Can I access the web interface from the internet?",
         "answer": "By default the web interface is only accessible from the local network.  It is not recommended to expose the web interface to the internet at this time until we add additional security measures for user authentication."
       }
+      ,
+      {
+        "question": "Isn't it dangerous to have NAS and other applications on my router?",
+        "answer": "In our opinions there is an elevated risk, however one that for the average user is minimal.  The entire router is firewalled from the internet, so the only attack vector is inside your network.  However what is great about our system is you get to choose rather you have other applications enabled our not.  We are just creating our ultimate solution, it is up to the user what they do with it."
+      }
+      ,
+      {
+        "question": "What are some good things to use to troubleshoot issues?",
+        "answer": "Use 'systemctl status kea-ctrl-agent.service' to see if DHCP is running. Use to 'cat /etc/darkflows/d_network.cfg' to see if at least two network interfaces are there. Use 'systemctl status nextjs' to see if webserver is running. Use 'ip addr show' to see what interfaces are setup. Use 'cat /etc/network/interfaces' to see what interfaces are configured."
+      }
+      ,
+      {
+        "question": "What debian ISO should I use to install DarkFlows?",
+        "answer": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.9.0-amd64-netinst.iso"
+      }
+      ,
+      {
+        "question": "What is command to install DarkFlows?",
+        "answer": "su - root ; apt install curl ; curl -sSL https://darkflows.com/downloads/install.sh | bash"
+      }
+
+
+      
+
     ]
   },
   "footer": {

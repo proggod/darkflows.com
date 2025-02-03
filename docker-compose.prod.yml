@@ -6,14 +6,13 @@ services:
     image: proggod/darkflows-web:latest
     ports:
       - "3050:3050"
-    environment:
-      - NODE_ENV=production
-      - PORT=3050
-      - HOSTNAME=0.0.0.0
-      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env.production
     restart: unless-stopped
     networks:
       - web
+    depends_on:
+      - mongodb
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3050"]
       interval: 30s
@@ -25,6 +24,29 @@ services:
         max-size: "10m"
         max-file: "3"
     tty: true
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=darkflows
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - web
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mongodb_data:
+    driver: local
 
 networks:
   web:

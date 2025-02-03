@@ -178,7 +178,6 @@
         "answer": "su - root ; apt install curl ; curl -sSL https://darkflows.com/downloads/install.sh | bash"
       }
 
-
       
 
     ]

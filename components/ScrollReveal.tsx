@@ -10,14 +10,22 @@ interface Props {
 
 const ScrollReveal = ({ data }: Props) => {
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [nextSectionVisible, setNextSectionVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const position = window.scrollY;
       const windowHeight = window.innerHeight;
-      // Convert scroll position to percentage (0-100)
+      // Keep the animation at 100% after reaching it, but continue tracking scroll
       const scrollPercentage = Math.min((position / windowHeight) * 100, 100);
       setScrollPosition(scrollPercentage);
+
+      // Check if first DataConnectSection is visible
+      const firstSection = document.getElementById('data-section-1');
+      if (firstSection) {
+        const rect = firstSection.getBoundingClientRect();
+        setNextSectionVisible(rect.top < window.innerHeight - 100);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -25,7 +33,7 @@ const ScrollReveal = ({ data }: Props) => {
   }, []);
 
   return (
-    <div className="relative min-h-[200vh] bg-black">
+    <div className="relative min-h-[400vh] bg-black">
       {/* First section - Initial view */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 w-full relative">
@@ -45,7 +53,7 @@ const ScrollReveal = ({ data }: Props) => {
 
             {/* New scroll indicator */}
             <div 
-              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-center animate-bounce"
+              className="absolute bottom-48 left-1/2 -translate-x-1/2 text-center animate-bounce"
               style={{
                 opacity: scrollPosition < 10 ? 1 : 0,
                 transition: 'opacity 0.5s ease-in-out'
@@ -107,7 +115,7 @@ const ScrollReveal = ({ data }: Props) => {
 
               {/* Second scroll indicator - appears with laptop */}
               <div 
-                className="absolute -bottom-32 left-1/2 -translate-x-1/2 text-center animate-bounce"
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center animate-bounce"
                 style={{
                   opacity: scrollPosition > 33 && scrollPosition < 66 ? 1 : 0,
                   transition: 'opacity 0.5s ease-in-out'
@@ -146,11 +154,11 @@ const ScrollReveal = ({ data }: Props) => {
             </div>
           </div>
 
-          {/* Final text overlay */}
+          {/* Final text overlay - modified to stay visible */}
           <div 
             className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
             style={{
-              opacity: scrollPosition > 66 ? 1 : 0
+              opacity: scrollPosition >= 100 ? 1 : 0
             }}
           >
             <div className="text-white text-center">
@@ -162,6 +170,47 @@ const ScrollReveal = ({ data }: Props) => {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Continue Scrolling indicator */}
+      <div 
+        className="fixed bottom-12 left-1/2 -translate-x-1/2 w-full max-w-xl text-center z-50"
+        style={{
+          opacity: scrollPosition >= 33 && !nextSectionVisible ? 1 : 0,
+          transition: 'opacity 0.5s ease-in-out'
+        }}
+      >
+        <div className="flex items-center justify-center gap-4 bg-black/50 backdrop-blur-sm py-2 px-4 rounded-full">
+          <svg 
+            className="w-8 h-8 text-white rotate-180" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+            />
+          </svg>
+          
+          <p className="text-white text-lg font-medium">Continue Scrolling</p>
+          
+          <svg 
+            className="w-8 h-8 text-white" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+            />
+          </svg>
         </div>
       </div>
     </div>

@@ -1,0 +1,27 @@
+---
+description: next api use
+globs: 
+---
+
+# Your rule content
+
+proper way to do routes
+- this is nextjs 15 make sure you follow conventions
+
+const execAsync = promisify(exec)
+
+// Define the context type with params as a Promise
+interface RouteContext {
+  params: Promise<{
+    name: string;
+  }>;
+}
+
+export async function GET(
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    // Await the params Promise to get the actual parameters
+    const { name } = await context.params;
+    

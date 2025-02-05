@@ -2,6 +2,11 @@
 FROM node:18-alpine AS builder
 
 WORKDIR /app
+
+# Add build-time environment variables
+ENV MONGODB_URI="mongodb://mongodb:27017/darkflows"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY package*.json ./
 RUN npm ci
 COPY . .
@@ -17,6 +22,7 @@ ENV NODE_ENV=production
 ENV PORT=3050
 ENV HOSTNAME="0.0.0.0"
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV MONGODB_URI="mongodb://mongodb:27017/darkflows"
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public

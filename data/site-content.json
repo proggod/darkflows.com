@@ -8,6 +8,26 @@
   },
   "dataConnectSections": [
     {
+      "id": "data-section-0a",
+      "title": "Why another router OS?",
+      "description": "I was frustrated with the ability to get true latency free gaming on my home network, and the ability to have a solution that took full advantage of my hardware and gave me the ability to use CAKE to fix these problems.  So, I decided to create my own solution.",
+      "features": [
+        {
+          "title": "Latency Free Gaming",
+          "subtitle": "CAKE plus full Linux Kernel support was the best solution"
+        },
+        {
+          "title": "Auto Configuration",
+          "subtitle": "Install and configure your router in minutes with our automated installer"
+        },
+        {
+          "title": "Full Control",
+          "subtitle": "Easily spot and solve problems on your network"
+        }
+      ],
+      "image": "/male_firefighter2.png"
+    },
+    {
       "id": "data-section-1",
       "title": "Fully Customizable Dashboard",
       "description": "Easily hide and re-arrange the widgets to always have the perfect view of your network.",
@@ -47,6 +67,36 @@
       ],
       "image": "/cake.png"
     },
+    {
+      "id": "data-section-0b",
+      "title": "Solutions",
+      "description": "Comes pre-configured with the bestsolutions that work together",
+      "features": [
+        {
+          "title": "NFTables",
+          "subtitle": "Modern firewall technology with better performance"
+        },
+        {
+          "title": "CAKE",
+          "subtitle": "Amazing packet based traffic shaping"
+        },
+        {
+          "title": "PiHole",
+          "subtitle": "Block ads and protect your network"
+        },
+        {
+          "title": "Docker",
+          "subtitle": "Easily install other applications"
+        },
+        {
+          "title": "Samba",
+          "subtitle": "Optimized for high speed NAS storage"
+        }
+
+      ],
+      "image": "/female_firefighter1.png"
+    },
+
     {
       "id": "data-section-3",
       "title": "No more Ads",

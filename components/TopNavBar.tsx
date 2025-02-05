@@ -29,7 +29,7 @@ export default function TopNavBar() {
         {/* Center - Description */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
           <p className="text-sm text-muted-foreground whitespace-nowrap text-gray-400">
-            High Performance Routing OS - The Router for the Rest of Us
+            Have your CAKE and eat it too...  DarkFlows RouterOS
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function TopNavBar() {
 
           {/* Download Button */}
           <Link 
-            href="https://darkflows.com/downloads/"
+            href="/downloads"
             className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors"
           >
             Download

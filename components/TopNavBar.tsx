@@ -67,7 +67,7 @@ export default function TopNavBar() {
 
           {/* Download Button */}
           <Link 
-            href="/downloads"
+            href="/downloadpage"
             className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors"
           >
             Download

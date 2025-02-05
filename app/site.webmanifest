@@ -1,0 +1,14 @@
+{
+  "name": "DarkFlows Router OS",
+  "short_name": "DarkFlows",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#111111",
+  "background_color": "#111111",
+  "display": "standalone"
+} 

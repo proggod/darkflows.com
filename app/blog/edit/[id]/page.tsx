@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import BlogEditor from '@/components/BlogEditor';
-import { auth } from '@/auth';
+import { verifySession } from '@/lib/session';
 
 interface Props {
   params: Promise<{
@@ -23,46 +23,48 @@ interface PostDocument {
   coverImage?: string;
   readingTime: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 async function getPost(id: string): Promise<PostDocument> {
   await connectDB();
   const post = await Post.findById(id)
     .populate('author', 'name email')
-    .lean() as unknown as PostDocument;
+    .lean() as any;
   
   if (!post) {
     notFound();
   }
   
-  return post;
-}
-
-async function getUser() {
-  const session = await auth();
-  return session?.user;
+  // Serialize the MongoDB ObjectId and dates to strings
+  return {
+    ...post,
+    _id: post._id.toString(),
+    author: {
+      ...post.author,
+      _id: post.author._id.toString(),
+    },
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+  } as PostDocument;
 }
 
 export default async function EditPostPage({ params }: Props) {
-  const { id } = await params;
-  const [post, user] = await Promise.all([getPost(id), getUser()]);
+  const [session, { id }] = await Promise.all([
+    verifySession(),
+    params
+  ]);
+
+  const post = await getPost(id);
 
   // Check if user is the author
-  if (user?.id !== post.author._id.toString()) {
+  if (session.id !== post.author._id) {
     notFound();
   }
 
   return (
     <div className="py-8">
-      <BlogEditor
-        initialData={{
-          title: post.title,
-          content: post.content,
-          category: post.category,
-          coverImage: post.coverImage,
-        }}
-        postId={id}
-      />
+      <BlogEditor post={post} />
     </div>
   );
 } 

@@ -5,7 +5,7 @@ services:
     container_name: darkflows-dev
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "3050:3050"
     env_file:
@@ -17,6 +17,18 @@ services:
       - .:/app
       - /app/node_modules
       - /app/.next
+      - uploads_data_dev:/app/public/uploads
+    environment:
+      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
+      - NODE_ENV=development
+      - PORT=3050
+      - NEXTAUTH_URL=http://localhost:3050
+      - NEXTAUTH_SECRET=kzWz077kkRFUcmEWzP7AFzxEpv8KFkqowdoR76ywsY
+      - NEXTAUTH_URL_INTERNAL=http://localhost:3050
+      - NEXT_PUBLIC_RESET_PASSWORD=bob
+      - RESET_PASSWORD=bob
+      - NEXT_PUBLIC_APP_URL=http://localhost:3050
+    command: npm run dev
 
   mongodb:
     image: mongo:latest
@@ -24,9 +36,17 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - mongodb_data_dev:/data/db
     environment:
       - MONGO_INITDB_DATABASE=darkflows
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=darkflows
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
-  mongodb_data: 
+  mongodb_data_dev:
+  uploads_data_dev: 

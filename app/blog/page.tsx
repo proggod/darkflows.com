@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-import { auth } from '@/auth';
+import { verifySession } from '@/lib/session';
 
 const CATEGORIES = ['All', 'Tutorial', 'News', 'Release', 'Guide', 'Other'];
 
@@ -24,15 +24,33 @@ async function getPosts(category?: string): Promise<Post[]> {
   await connectDB();
   const query = category && category !== 'All' ? { category } : {};
   
-  return Post.find(query)
+  const posts = await Post.find(query)
     .populate('author', 'name email')
     .sort({ createdAt: -1 })
-    .lean() as unknown as Post[];
+    .lean() as any[];
+
+  return posts.map(post => ({
+    ...post,
+    _id: post._id.toString(),
+    author: post.author ? {
+      ...post.author,
+      _id: post.author._id?.toString(),
+    } : {
+      _id: 'deleted',
+      name: 'Deleted User',
+      email: '',
+    },
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+  }));
 }
 
-async function getUser() {
-  const session = await auth();
-  return session?.user;
+async function getSession() {
+  try {
+    return await verifySession();
+  } catch {
+    return null;  // Return null if not authenticated
+  }
 }
 
 interface Props {
@@ -43,9 +61,9 @@ interface Props {
 
 export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
-  const [posts, user] = await Promise.all([
+  const [posts, session] = await Promise.all([
     getPosts(params.category),
-    getUser()
+    getSession()
   ]);
 
   return (
@@ -70,7 +88,7 @@ export default async function BlogPage({ searchParams }: Props) {
           </div>
         </div>
 
-        {user && (
+        {session && (
           <Link
             href="/blog/new"
             className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500"

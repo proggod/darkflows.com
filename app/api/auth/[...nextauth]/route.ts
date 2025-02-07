@@ -1,1 +1,1 @@
-export { GET, POST } from '@/auth' 
+// Delete this file as it's no longer needed 

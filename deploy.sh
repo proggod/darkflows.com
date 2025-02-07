@@ -3,6 +3,13 @@
 # Exit on any error
 set -e
 
+# Detect which docker compose command to use
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+else
+    DOCKER_COMPOSE="docker compose"
+fi
+
 # Default to development mode
 ENVIRONMENT="dev"
 
@@ -29,39 +36,40 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 echo "🛑 Stopping existing containers..."
-docker-compose -f ${COMPOSE_FILE} down
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} down
 
 echo "🧹 Cleaning up..."
 docker system prune -f
 
 # Create Docker volumes if they don't exist
-echo "📦 Setting up MongoDB volume..."
+echo "📦 Setting up volumes..."
 if [ "$ENVIRONMENT" = "prod" ]; then
     docker volume create mongodb_data || true
+    docker volume create uploads_data || true
 else
     docker volume create mongodb_data_dev || true
+    docker volume create uploads_data_dev || true
 fi
 
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "⬇️ Pulling latest images..."
-    docker-compose -f ${COMPOSE_FILE} pull
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} pull
 else
     echo "🏗️ Building local images..."
-    docker-compose -f ${COMPOSE_FILE} build
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} build
 fi
 
 echo "🚀 Starting containers..."
-docker-compose -f ${COMPOSE_FILE} up -d
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} up -d
 
 echo "⏳ Waiting for MongoDB to be ready..."
 if [ "$ENVIRONMENT" = "prod" ]; then
-    docker-compose -f ${COMPOSE_FILE} exec -T mongodb sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
 else
-    docker-compose -f ${COMPOSE_FILE} exec -T mongodb-dev sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
 fi
 
 echo "✅ Deployment complete!"
-echo "📝 To view logs, run: docker-compose -f ${COMPOSE_FILE} logs -f"
 
 # Print connection information
 echo "🔌 MongoDB is available at:"
@@ -69,6 +77,9 @@ if [ "$ENVIRONMENT" = "prod" ]; then
     echo "  - Internal: mongodb://mongodb:27017"
     echo "  - External: mongodb://localhost:27017"
 else
-    echo "  - Internal: mongodb://mongodb-dev:27017"
+    echo "  - Internal: mongodb://mongodb:27017"
     echo "  - External: mongodb://localhost:27017"
-fi 
+fi
+
+echo "📝 Showing logs..."
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} logs -f darkflows 

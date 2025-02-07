@@ -16,9 +16,9 @@ const PostSchema = new mongoose.Schema({
     required: true
   },
   category: {
-    type: String,
-    required: [true, 'Please provide a category'],
-    enum: ['Tutorial', 'News', 'Release', 'Guide', 'Other']
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true
   },
   coverImage: {
     type: String,

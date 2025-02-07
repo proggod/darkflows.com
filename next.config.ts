@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
-    unoptimized: true, // For static export
+    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -23,14 +23,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
       allowedOrigins: ['*']
     },
-    turbo: {
-      rules: {
-        // Configure SVG handling for Turbopack
-        '*.svg': ['@svgr/webpack'],
-      },
-    },
   },
-  // Add this section to handle MongoDB connection
   serverRuntimeConfig: {
     mongodb: {
       uri: process.env.MONGODB_URI

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { signOut } from '@/auth';
+import { cookies } from 'next/headers';
 
 export async function POST() {
   try {
-    await signOut();
+    await cookies().delete('session');
     return NextResponse.json({ message: 'Logged out successfully' });
   } catch (err) {
     console.error('Logout error:', err);

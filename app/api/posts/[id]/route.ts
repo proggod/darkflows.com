@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { verifySession } from '@/lib/session';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 
@@ -41,10 +41,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await verifySession();
 
     await connectDB();
     const post = await Post.findById(id);
@@ -53,7 +50,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    if (post.author.toString() !== session.user.id) {
+    if (post.author.toString() !== session.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -85,10 +82,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await verifySession();
 
     await connectDB();
     const post = await Post.findById(id);
@@ -97,8 +91,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    // Check if user is the author
-    if (post.author.toString() !== session.user.id) {
+    if (post.author.toString() !== session.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

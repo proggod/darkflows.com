@@ -3,40 +3,89 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { SignJWT } from 'jose';
+import { cookies } from 'next/headers';
+
+// Helper function to set session cookie
+async function setSessionCookie(token: string) {
+  'use server'
+  const cookieStore = cookies()
+  await Promise.resolve(cookieStore.set('session', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  }))
+}
 
 export async function POST(request: Request) {
+  console.log('=== REGISTER ROUTE START ===');
   try {
     await connectDB();
-    const { name, email, password } = await request.json();
+    const body = await request.json();
+    console.log('Request body:', { ...body, password: '[REDACTED]' });
+
+    const { name, email, password } = body;
 
     // Check if user already exists
+    console.log('Checking for existing user...');
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists:', email);
       return NextResponse.json(
         { error: 'Email already registered' },
         { status: 400 }
       );
     }
 
+    // Check if this is the first user
+    console.log('Checking if first user...');
+    const isFirstUser = await User.countDocuments() === 0;
+    console.log('Is first user:', isFirstUser);
+
     // Create new user
+    console.log('Creating new user...');
     const user = await User.create({
       name,
       email,
-      password, // Password will be hashed by the User model pre-save hook
-      role: 'author' // Default role for new users
+      password,
+      role: isFirstUser ? 'admin' : 'user',
+      approved: isFirstUser
     });
 
-    // Remove password from response
-    const userWithoutPassword = Object.fromEntries(
-      Object.entries(user.toObject()).filter(([key]) => key !== 'password')
-    );
+    // If first user, create session
+    if (isFirstUser) {
+      const token = await new SignJWT({
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        approved: user.approved
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 
-    return NextResponse.json(userWithoutPassword, { status: 201 });
-  } catch (err) {
-    console.error('Registration error:', err);
+      // Set cookie using the helper function
+      await setSessionCookie(token);
+
+      return NextResponse.json({ 
+        success: true,
+        redirectTo: '/admin'
+      });
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      redirectTo: '/login'
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
     return NextResponse.json(
       { error: 'Registration failed' },
       { status: 500 }
     );
+  } finally {
+    console.log('=== REGISTER ROUTE END ===');
   }
 } 

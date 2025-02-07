@@ -1,43 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useFormState } from 'react-dom';
+import { login } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [state, formAction] = useFormState(login, { error: null });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Login failed');
-      }
-
-      router.push('/blog');
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Handle successful login
+  if (state?.success) {
+    router.push(state.redirectTo);
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
@@ -47,13 +23,13 @@ export default function LoginPage() {
           <p className="text-gray-400">Welcome back!</p>
         </div>
 
-        {error && (
+        {state?.error && (
           <div className="p-3 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm">
-            {error}
+            {state.error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-400">
               Email
@@ -82,10 +58,9 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            Login
           </button>
         </form>
 

@@ -3,7 +3,20 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-import { auth } from '@/auth';
+import { verifySession } from '@/actions/auth';
+
+interface PostDocument {
+  _id: any;
+  title: string;
+  content: string;
+  author: {
+    _id: any;
+    name: string;
+    email: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export async function GET() {
   try {
@@ -20,22 +33,49 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const session = await verifySession();
 
     await connectDB();
-    const body = await request.json();
+    const data = await request.json();
+
+    // Create the post
     const post = await Post.create({
-      ...body,
-      author: session.user.id,
-      readingTime: Math.ceil(body.content.split(' ').length / 200) // Rough estimate
+      ...data,
+      author: session.id,
+      readingTime: Math.ceil(data.content.split(' ').length / 200)
     });
 
-    return NextResponse.json({ post }, { status: 201 });
+    // Fetch the complete post with populated author
+    const populatedPost = await Post.findById(post._id)
+      .populate('author', 'name email')
+      .lean() as unknown as PostDocument;
+
+    if (!populatedPost) {
+      throw new Error('Failed to fetch created post');
+    }
+
+    // Serialize the response
+    const serializedPost = {
+      ...populatedPost,
+      _id: populatedPost._id.toString(),
+      author: populatedPost.author ? {
+        ...populatedPost.author,
+        _id: populatedPost.author._id.toString(),
+      } : {
+        _id: 'deleted',
+        name: 'Deleted User',
+        email: '',
+      },
+      createdAt: populatedPost.createdAt.toISOString(),
+      updatedAt: populatedPost.updatedAt.toISOString(),
+    };
+
+    return NextResponse.json(serializedPost, { status: 201 });
   } catch (err) {
-    console.error('Failed to create post:', err);
-    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+    console.error('Create post error:', err);
+    return NextResponse.json(
+      { error: 'Failed to create post' },
+      { status: 500 }
+    );
   }
 } 

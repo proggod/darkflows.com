@@ -39,21 +39,24 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Then login
+      // Then login - Add better error handling
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
+      const loginData = await loginRes.json();
+
       if (!loginRes.ok) {
-        throw new Error('Login after registration failed');
+        console.error('Login response:', loginData);
+        throw new Error(loginData.error || 'Login after registration failed');
       }
 
       router.push('/blog');
       router.refresh();
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('Registration/Login error:', err);
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);

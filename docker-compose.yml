@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   darkflows:
@@ -12,4 +12,31 @@ services:
       - "3050:3050"
     environment:
       - NODE_ENV=production
-    restart: unless-stopped 
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - db
+  
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: co2_emissions
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 

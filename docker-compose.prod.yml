@@ -14,7 +14,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - uploads_data:/var/www/darkflows.com/public/uploads
+      - /var/www/darkflows.com/public/uploads:/app/public/uploads
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3050"]
       interval: 30s
@@ -41,7 +41,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - mongodb_data:/var/www/darkflows.com/data/db
+      - /var/www/darkflows.com/data/db:/data/db
     networks:
       - web
     healthcheck:
@@ -51,8 +51,6 @@ services:
       retries: 3
 
 volumes:
-  mongodb_data:
-    driver: local
   uploads_data:
     driver: local
 

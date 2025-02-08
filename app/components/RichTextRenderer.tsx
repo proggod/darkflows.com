@@ -34,29 +34,59 @@ interface RichTextRendererProps {
 
 export default function RichTextRenderer({ content }: RichTextRendererProps) {
   const [html, setHtml] = useState('');
-  const [debug, setDebug] = useState({
-    isJson: false,
-    hasCodeBlocks: false,
-    highlightStatus: 'Not initialized',
-    codeBlocksFound: 0,
-    generatedHtml: '',
-    tokenExample: ''
-  });
 
   // Initialize highlight.js
   useEffect(() => {
     hljs.registerLanguage('typescript', typescript);
   }, []);
 
+  // Add copy handler
+  useEffect(() => {
+    const codeBlocks = document.querySelectorAll('.code-block-wrapper');
+    codeBlocks.forEach(wrapper => {
+      const copyButton = wrapper.querySelector('.copy-button');
+      const copyMessage = wrapper.querySelector('.copy-message');
+      const codeElement = wrapper.querySelector('code');
+      
+      copyButton?.addEventListener('click', () => {
+        const code = codeElement?.textContent || '';
+        navigator.clipboard.writeText(code);
+        
+        // Show feedback
+        const icon = copyButton.querySelector('svg');
+        icon?.classList.add('text-green-400');
+        copyMessage?.classList.remove('opacity-0');
+        
+        setTimeout(() => {
+          icon?.classList.remove('text-green-400');
+          copyMessage?.classList.add('opacity-0');
+        }, 2000);
+      });
+    });
+  }, [html]);
+
+  // Modify the code block HTML generation
+  const wrapWithCopyButton = (codeHtml: string) => `
+    <div class="code-block-wrapper relative">
+      <div class="absolute right-2 top-2 flex items-center gap-2">
+        <span class="copy-message opacity-0 text-xs text-green-400 transition-opacity">Copied!</span>
+        <button class="copy-button p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 hover:text-white transition-colors">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+          </svg>
+        </button>
+      </div>
+      ${codeHtml}
+    </div>
+  `;
+
   // Parse and highlight content
   useEffect(() => {
     try {
       const jsonContent = JSON.parse(content) as JsonContent;
-      const codeBlocks = jsonContent.content.filter(
-        (node: Node) => node.type === 'codeBlock'
-      );
-
       let processedHtml = '';
+      
       jsonContent.content.forEach((node: Node) => {
         switch (node.type) {
           case 'codeBlock':
@@ -64,7 +94,9 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
             const highlighted = hljs.highlight(code, {
               language: 'typescript'
             }).value;
-            processedHtml += `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`;
+            processedHtml += wrapWithCopyButton(
+              `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`
+            );
             break;
           case 'blockquote':
             let blockquoteContent = '';
@@ -74,7 +106,9 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
                 const highlighted = hljs.highlight(code, {
                   language: innerNode.attrs?.language || 'typescript'
                 }).value;
-                blockquoteContent += `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`;
+                blockquoteContent += wrapWithCopyButton(
+                  `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`
+                );
               }
             });
             processedHtml += `<blockquote>${blockquoteContent}</blockquote>`;
@@ -92,26 +126,11 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
       });
 
       setHtml(processedHtml);
-      setDebug(prev => ({
-        ...prev,
-        isJson: true,
-        hasCodeBlocks: codeBlocks.length > 0,
-        codeBlocksFound: codeBlocks.length,
-        generatedHtml: processedHtml.slice(0, 200) + '...',
-        highlightStatus: 'Processed with highlight.js'
-      }));
-    } catch (e) {
+    } catch {
       setHtml(content);
-      setDebug(prev => ({
-        ...prev,
-        isJson: false,
-        hasCodeBlocks: content.includes('<pre><code'),
-        generatedHtml: content.slice(0, 200) + '...',
-        highlightStatus: `Error: ${e}`
-      }));
     }
   }, [content]);
-
+{/*
   // Generate sample HTML for test section
   const sampleCode = `// Sample TypeScript code
 function hello(name: string): string {
@@ -125,35 +144,21 @@ function hello(name: string): string {
       }).value
     }</code></pre>
   `;
-
+*/}
   return (
     <>
-      {/* Debug panel - uncomment for testing
-      <div className="mb-4 p-2 bg-gray-800 rounded text-xs">
-        <div className="text-gray-400">
-          Format: {debug.isJson ? 'JSON' : 'HTML'} |
-          Code Blocks: {debug.hasCodeBlocks ? 'Yes' : 'No'} |
-          Blocks Found: {debug.codeBlocksFound} |
-          Highlight: {debug.highlightStatus}
-          <details className="mt-1">
-            <summary>Generated HTML</summary>
-            <pre className="mt-1 p-1 bg-gray-900 rounded overflow-x-auto">
-              {debug.generatedHtml}
-            </pre>
-          </details>
-          <details className="mt-1">
-            <summary>Token Example</summary>
-            <pre className="mt-1 p-1 bg-gray-900 rounded overflow-x-auto">
-              {debug.tokenExample}
-            </pre>
-          </details>
-        </div>
-      </div>
-      */}
-
       {/* Real content */}
       <div 
-        className="prose prose-invert max-w-none w-full mb-8"
+        className="prose prose-invert max-w-none w-full mb-8
+          [&_pre]:!bg-[#0d1117]
+          [&_pre]:!p-4
+          [&_pre]:!rounded-lg
+          [&_pre]:!text-xs
+          [&_pre]:!leading-relaxed
+          [&_pre]:!overflow-x-auto
+          [&_pre_code]:!p-0
+          [&_pre_code]:!font-mono
+          [&_pre_code]:!text-xs"
         dangerouslySetInnerHTML={{ __html: html }}
       />
 

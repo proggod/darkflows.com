@@ -91,7 +91,7 @@ export const getSession = cache(async () => {
 })
 
 // Add detailed logging for authentication flow
-function logAuthAttempt(stage: string, data: any) {
+function logAuthAttempt(stage: string, data: Record<string, unknown>) {
   console.log(`🔐 Auth [${stage}]:`, JSON.stringify(data, null, 2));
 }
 
@@ -197,7 +197,7 @@ export async function login(
         reason: !user ? 'USER_NOT_FOUND' : 'USER_NOT_APPROVED',
         timestamp: new Date().toISOString()
       });
-      return { error: 'Invalid credentials' }
+      return { error: 'Invalid credentials', success: false }
     }
 
     const isValid = await user.comparePassword(password)
@@ -209,7 +209,7 @@ export async function login(
     });
 
     if (!isValid) {
-      return { error: 'Invalid credentials' }
+      return { error: 'Invalid credentials', success: false }
     }
 
     // Create session token with only serializable data
@@ -254,7 +254,7 @@ export async function login(
       stack: error instanceof Error ? error.stack : undefined
     });
     console.error('Login error:', error)
-    return { error: 'Authentication failed' }
+    return { error: 'Authentication failed', success: false }
   }
 }
 

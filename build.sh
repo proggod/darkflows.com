@@ -27,12 +27,12 @@ fi
 echo "📝 Checking environment files..."
 if [ ! -f .env.production ]; then
     echo "⚠️  .env.production file not found. Creating from example..."
-    cp .env.example .env.production
+    cp sample.env.production .env.production
 fi
 
-echo "🏗️ Building amd64 image..."
+echo "🏗️ Building multi-platform image..."
 docker buildx build \
-  --platform linux/amd64 \
+  --platform linux/amd64,linux/arm64 \
   --no-cache \
   --pull \
   -t proggod/darkflows-web:latest \
@@ -44,17 +44,13 @@ docker buildx rm darkflows-builder
 
 echo "✅ Build complete!"
 
-echo "📝 Setting up environment..."
-cp .env.production /var/www/darkflows.com/code/.env.production
 
 # Make sure the file exists and has content
-echo "Verifying environment file:"
-cat /var/www/darkflows.com/code/.env.production
 
 # Start the containers with the environment file
-docker compose -f docker-compose.prod.yml up -d
+# docker compose -f docker-compose.prod.yml up -d
 
-echo "Verifying container environment:"
-docker exec darkflows printenv | grep JWT_SECRET
+# echo "Verifying container environment:"
+# docker exec darkflows printenv | grep JWT_SECRET
 
 export JWT_SECRET="gfgd09809fd8g90dfg8df09g8gdf098g098" 

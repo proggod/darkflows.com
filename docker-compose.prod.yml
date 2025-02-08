@@ -14,7 +14,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - uploads_data:/app/public/uploads
+      - uploads_data:/var/www/darkflows.com/public/uploads
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://0.0.0.0:3050/api/debug"]
       interval: 30s

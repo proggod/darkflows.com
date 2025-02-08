@@ -54,7 +54,7 @@ if [ "$ENVIRONMENT" = "prod" ]; then
     
     # Set proper permissions
     sudo chmod -R 700 /var/www/darkflows.com/data/db
-    sudo chmod -R 775 /var/www/darkflows.com/public/uploads
+    sudo chmod -R 755 /var/www/darkflows.com/public/uploads
 else
     docker volume create mongodb_data_dev || true
     docker volume create uploads_data_dev || true

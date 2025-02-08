@@ -13,6 +13,12 @@ const protectedPaths = [
   '/api/upload'
 ];
 
+// List of public paths that don't need auth
+const publicPaths = [
+  '/blog',
+  '/api/posts'
+];
+
 export async function middleware(request: NextRequest) {
   // Skip auth check for reset endpoint
   if (request.nextUrl.pathname === '/api/admin/reset') {
@@ -21,12 +27,6 @@ export async function middleware(request: NextRequest) {
 
   console.log('Environment:', process.env.NODE_ENV);
   
-  // List of public paths that don't need auth
-  const publicPaths = ['/blog', '/api/posts'];
-  if (publicPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
-
   // Check if the current path requires authentication
   const isProtectedPath = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)

@@ -6,8 +6,15 @@ export default async function BlogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await verifySession();
-  const isAdmin = session?.role === 'admin';
+  let isAdmin = false;
+  
+  try {
+    const session = await verifySession();
+    isAdmin = session?.role === 'admin';
+  } catch {
+    // If verification fails, user is not admin
+    isAdmin = false;
+  }
 
   return (
     <div>

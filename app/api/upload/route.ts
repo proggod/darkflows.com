@@ -20,19 +20,20 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file') as Blob;
     
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const type = file.type || '';
+    if (!type.startsWith('image/')) {
       return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
     }
 
     // Create unique filename
-    const ext = file.name.split('.').pop();
+    const ext = type.split('/')[1] || 'jpg';
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
     
     // Ensure uploads directory exists

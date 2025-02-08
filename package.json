@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "set NODE_OPTIONS=--no-deprecation && next build",
-    "start": "next start -p 3050",
+    "start": "NODE_NO_WARNINGS=1 next start -p 3050",
     "lint": "next lint"
   },
   "dependencies": {

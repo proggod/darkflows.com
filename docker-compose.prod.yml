@@ -26,6 +26,9 @@ services:
         max-size: "10m"
         max-file: "3"
     tty: true
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27018/darkflows?authSource=admin
 
   mongodb:
     image: mongo:latest
@@ -35,7 +38,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=darkflows
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data:/var/www/darkflows/data/db
     networks:

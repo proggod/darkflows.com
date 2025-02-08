@@ -34,7 +34,7 @@ services:
     image: mongo:latest
     container_name: darkflows-mongodb
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data_dev:/data/db
     environment:

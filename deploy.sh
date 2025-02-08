@@ -75,10 +75,10 @@ echo "✅ Deployment complete!"
 echo "🔌 MongoDB is available at:"
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "  - Internal: mongodb://mongodb:27017"
-    echo "  - External: mongodb://localhost:27017"
+    echo "  - External: mongodb://localhost:27018"
 else
     echo "  - Internal: mongodb://mongodb:27017"
-    echo "  - External: mongodb://localhost:27017"
+    echo "  - External: mongodb://localhost:27018"
 fi
 
 echo "📝 Showing logs..."

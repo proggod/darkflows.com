@@ -30,7 +30,6 @@ ENV NODE_ENV=production
 ENV PORT=3050
 ENV HOSTNAME="0.0.0.0"
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV MONGODB_URI="mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin"
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public

@@ -4,6 +4,14 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { NextRequest } from 'next/server';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb'  // Adjust as needed
+    }
+  }
+};
+
 export async function POST(request: NextRequest) {
   try {
     const session = await verifySession();

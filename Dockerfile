@@ -40,10 +40,10 @@ COPY --from=builder /app/.next/static ./.next/static
 RUN mkdir -p /app/public/uploads
 
 # Create a non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-RUN chown -R nextjs:nodejs /app
-USER nextjs
+RUN addgroup -S -g 998 appgroup && \
+    adduser -S -u 998 -G appgroup appuser
+RUN chown -R appuser:appgroup /app
+USER appuser:appgroup
 
 # Expose the port
 EXPOSE 3050

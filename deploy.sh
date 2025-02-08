@@ -44,18 +44,17 @@ docker system prune -f
 # Create Docker volumes if they don't exist
 echo "📦 Setting up volumes..."
 if [ "$ENVIRONMENT" = "prod" ]; then
-    # Create MongoDB data directory if it doesn't exist
+    # Create directories
     sudo mkdir -p /var/www/darkflows.com/data/db
-    # Create uploads directory if it doesn't exist
     sudo mkdir -p /var/www/darkflows.com/public/uploads
     
     # Set proper ownership
     sudo chown -R 999:999 /var/www/darkflows.com/data/db
-    sudo chown -R 1000:1000 /var/www/darkflows.com/public/uploads
+    sudo chown -R 998:998 /var/www/darkflows.com/public/uploads
     
     # Set proper permissions
     sudo chmod -R 700 /var/www/darkflows.com/data/db
-    sudo chmod -R 755 /var/www/darkflows.com/public/uploads
+    sudo chmod -R 775 /var/www/darkflows.com/public/uploads
 else
     docker volume create mongodb_data_dev || true
     docker volume create uploads_data_dev || true

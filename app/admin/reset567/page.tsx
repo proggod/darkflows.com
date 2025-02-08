@@ -24,11 +24,6 @@ export default function ResetPage() {
       return;
     }
 
-    if (password !== process.env.NEXT_PUBLIC_RESET_PASSWORD) {
-      setError('Invalid reset password');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
@@ -41,12 +36,24 @@ export default function ResetPage() {
         body: JSON.stringify({ password })
       });
 
+      const data = await res.json();
+      console.log('Reset attempt response:', {
+        status: res.status,
+        ok: res.ok,
+        data
+      });
+
       if (!res.ok) {
-        throw new Error('Failed to reset database');
+        throw new Error(data.error || 'Failed to reset database');
       }
 
       router.push('/setup');
     } catch (err) {
+      console.error('Reset error:', {
+        error: err,
+        message: err instanceof Error ? err.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
     }

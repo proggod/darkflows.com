@@ -25,14 +25,14 @@ done
 
 # Set the compose file based on environment
 COMPOSE_FILE="docker-compose.${ENVIRONMENT}.yml"
-ENV_FILE=".env.${ENVIRONMENT}"
+ENV_FILE=".env.production"  # Always use .env.production for prod
 
 echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
 
 # Check for environment file
 if [ ! -f "$ENV_FILE" ]; then
-    echo "⚠️  ${ENV_FILE} not found. Creating from example..."
-    cp .env.example "$ENV_FILE"
+    echo "⚠️  ${ENV_FILE} not found. Please create .env.production manually."
+    exit 1
 fi
 
 echo "🛑 Stopping existing containers..."

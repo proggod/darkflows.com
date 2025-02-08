@@ -22,9 +22,7 @@ services:
       - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
       - NODE_ENV=development
       - PORT=3050
-      - NEXTAUTH_URL=http://localhost:3050
-      - NEXTAUTH_SECRET=kzWz077kkRFUcmEWzP7AFzxEpv8KFkqowdoR76ywsY
-      - NEXTAUTH_URL_INTERNAL=http://localhost:3050
+      - JWT_SECRET=${JWT_SECRET:-your-development-secret}
       - RESET_PASSWORD=${RESET_PASSWORD:-}
       - NEXT_PUBLIC_APP_URL=http://localhost:3050
     command: npm run dev

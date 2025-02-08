@@ -30,9 +30,8 @@ services:
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
       - RESET_PASSWORD=${RESET_PASSWORD}
-      - NEXTAUTH_URL=https://darkflows.com  # Replace with your actual domain
-      - NEXTAUTH_URL_INTERNAL=http://localhost:3050
       - NEXT_PUBLIC_APP_URL=https://darkflows.com  # Replace with your actual domain
 
   mongodb:

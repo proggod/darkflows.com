@@ -9,11 +9,16 @@ const protectedPaths = [
   '/admin',
   '/blog/new',
   '/blog/edit',
-  '/api/admin',
+  '/api/admin/:path*',
   '/api/upload'
 ];
 
 export async function middleware(request: NextRequest) {
+  // Skip auth check for reset endpoint
+  if (request.nextUrl.pathname === '/api/admin/reset') {
+    return NextResponse.next();
+  }
+
   console.log('Environment:', process.env.NODE_ENV);
   
   // Skip auth check in development for testing

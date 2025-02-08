@@ -36,15 +36,28 @@ export default function ResetPage() {
         body: JSON.stringify({ password })
       });
 
-      const data = await res.json();
+      let data;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        console.error('Received non-JSON response:', await res.text());
+        throw new Error('Received invalid response from server');
+      }
+
       console.log('Reset attempt response:', {
         status: res.status,
         ok: res.ok,
-        data
+        contentType,
+        error: data?.error,
+        timestamp: new Date().toISOString()
       });
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to reset database');
+        throw new Error(
+          data?.error || 
+          `Failed to reset database (Status: ${res.status})`
+        );
       }
 
       router.push('/setup');
@@ -66,7 +79,7 @@ export default function ResetPage() {
         
         {error && (
           <div className="p-3 mb-4 bg-red-500/10 border border-red-500 rounded text-red-500">
-            {error}
+            <pre className="whitespace-pre-wrap break-words">{error}</pre>
           </div>
         )}
 

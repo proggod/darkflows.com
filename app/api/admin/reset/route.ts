@@ -24,8 +24,15 @@ export async function POST(request: NextRequest) {
     });
     
     if (password !== process.env.RESET_PASSWORD) {
-      console.warn('Reset password mismatch');
-      return NextResponse.json({ error: 'Invalid password' }, { status: 403 });
+      console.warn('Reset password mismatch:', {
+        timestamp: new Date().toISOString(),
+        providedPassword: password,
+        expectedPassword: process.env.RESET_PASSWORD,
+        note: 'If these match but still fail, check for whitespace or encoding issues'
+      });
+      return NextResponse.json({ 
+        error: `Invalid password.\n\nExpected: "${process.env.RESET_PASSWORD}"\nReceived: "${password}"\n\nLength: ${process.env.RESET_PASSWORD?.length} vs ${password?.length}` 
+      }, { status: 403 });
     }
 
     // Delete all documents from all collections

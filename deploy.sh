@@ -61,10 +61,10 @@ else
     docker volume create uploads_data_dev || true
 fi
 
+
+export RESET_PASSWORD=$(grep RESET_PASSWORD .env.production | cut -d '=' -f2 | tr -d '[:space:]')
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "⬇️ Pulling latest images..."
-    # Export RESET_PASSWORD from .env.production
-    export RESET_PASSWORD=$(grep RESET_PASSWORD .env.production | sed 's/^[^=]*=\s*\(.*\)\s*/\1/')
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} pull
 else
     echo "🏗️ Building local images..."

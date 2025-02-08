@@ -66,12 +66,18 @@ export function useSession() {
 
 // Export the session cookie helper
 export async function setSessionCookie(token: string) {
-  'use server'
-  const cookieStore = await cookies()
-  await cookieStore.set('session', token, {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  const cookieOptions = {
+    name: 'session',
+    value: token,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  })
+    secure: isProduction,  // Only use secure in production
+    sameSite: isProduction ? 'strict' as const : 'lax' as const,
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7 // 7 days
+  };
+
+  // Set the cookie
+  cookies().set(cookieOptions);
 } 

@@ -28,8 +28,11 @@ services:
     tty: true
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27018/darkflows?authSource=admin
+      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
       - RESET_PASSWORD=${RESET_PASSWORD}
+      - NEXTAUTH_URL=https://darkflows.com  # Replace with your actual domain
+      - NEXTAUTH_URL_INTERNAL=http://localhost:3050
+      - NEXT_PUBLIC_APP_URL=https://darkflows.com  # Replace with your actual domain
 
   mongodb:
     image: mongo:latest
@@ -38,8 +41,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=darkflows
-    ports:
-      - "27018:27017"
     volumes:
       - /var/www/darkflows.com/data/db:/data/db
     networks:

@@ -18,3 +18,11 @@ export function registerModels() {
         mongoose.model('Category', CategorySchema);
     }
 } 
+
+// Add this function to ensure models are registered and connected
+export async function initDatabase() {
+    registerModels();
+    if (mongoose.connection.readyState !== 1) {
+        await mongoose.connect(process.env.MONGODB_URI as string);
+    }
+} 

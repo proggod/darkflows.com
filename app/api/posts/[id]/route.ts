@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
+import { initDatabase } from '@/lib/db/init';
 
 // Get single post
 export async function GET(
@@ -74,30 +75,40 @@ export async function PUT(
 // Delete post
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params;
-
   try {
     const session = await verifySession();
+    
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
+    await initDatabase();
     await connectDB();
-    const post = await Post.findById(id);
 
+    const post = await Post.findById(params.id);
+    
     if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: 'Post not found' },
+        { status: 404 }
+      );
     }
 
-    if (post.author.toString() !== session.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    await Post.deleteOne({ _id: params.id });
 
-    await Post.findByIdAndDelete(id);
-    return NextResponse.json({ message: 'Post deleted successfully' });
-  } catch (error) {
-    console.error('Failed to delete post:', error);
     return NextResponse.json(
-      { error: 'Failed to delete post' },
+      { message: 'Post deleted successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    return NextResponse.json(
+      { message: 'Error deleting post' },
       { status: 500 }
     );
   }

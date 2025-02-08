@@ -8,6 +8,7 @@ import BlogEditor from '@/app/components/BlogEditor';
 import { formatDate } from '@/lib/format';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';
+import { initDatabase } from '@/lib/db/init';
 
 interface _PostDocument {
   _id: string;
@@ -69,6 +70,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
   const session = isEditing ? await verifySession() : null;
   
   try {
+    await initDatabase();
     await connectDB();
     const post = await Post.findById(id)
       .populate('author', 'name email')
@@ -111,14 +113,14 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
     };
 
     return (
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="w-full max-w-[90rem] mx-auto">
         {isEditing ? (
           <BlogEditor post={editorPost} />
         ) : (
           <>
             <BlogPost post={blogPost} isPreview={session?.role === 'admin'} />
             {session?.role === 'admin' && (
-              <div className="mt-8">
+              <div className="mt-8 px-4">
                 <Link 
                   href={`/blog/${id}?edit=true`}
                   className="text-blue-500 hover:underline"

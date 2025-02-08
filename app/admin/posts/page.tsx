@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { verifySession } from '@/lib/session';
 import { redirect } from 'next/navigation';
-import connectDB from '@/lib/mongodb';
+import { initDatabase } from '@/lib/db/init';
 import Post from '@/models/Post';
 import { Trash2 } from 'lucide-react';
 import DeletePost from '@/app/components/DeletePost';
@@ -15,7 +15,8 @@ export default async function AdminPostsPage() {
     redirect('/login');
   }
 
-  await connectDB();
+  await initDatabase();
+
   const posts = await Post.find()
     .populate('author', 'name email')
     .populate('category', 'name')

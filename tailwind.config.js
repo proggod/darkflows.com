@@ -14,7 +14,48 @@ module.exports = {
         DEFAULT: {
           css: {
             maxWidth: 'none',
-            color: '#9ca3af',
+            width: '100%',
+            pre: {
+              backgroundColor: '#111827',
+              color: '#e5e7eb',
+              overflowX: 'auto',
+              fontSize: '0.875rem !important',
+              lineHeight: '1.5',
+              padding: '1rem',
+              margin: '1rem 0',
+              code: {
+                backgroundColor: 'transparent',
+                padding: '0',
+                fontSize: '0.875rem !important',
+                border: 'none',
+              }
+            },
+            code: {
+              backgroundColor: '#1f2937',
+              color: '#e5e7eb',
+              padding: '0.2rem 0.4rem',
+              fontSize: '0.875rem !important',
+              fontWeight: '400',
+              borderRadius: '0.25rem',
+            },
+            'code::before': {
+              content: '""',
+            },
+            'code::after': {
+              content: '""',
+            },
+            p: {
+              fontSize: '1rem !important',
+              lineHeight: '1.75',
+              marginTop: '1.25em',
+              marginBottom: '1.25em',
+            },
+            a: {
+              color: '#60a5fa',
+              '&:hover': {
+                color: '#93c5fd',
+              },
+            },
             h1: {
               color: '#fff',
               fontSize: '2.25em',
@@ -41,28 +82,10 @@ module.exports = {
               marginTop: '1.25em',
               marginBottom: '0.75em',
             },
-            a: {
-              color: '#3b82f6',
-              '&:hover': {
-                color: '#60a5fa',
-              },
-            },
-            pre: {
-              backgroundColor: '#1f2937',
-              color: '#e5e7eb',
-            },
-            code: {
-              color: '#e5e7eb',
-              backgroundColor: '#374151',
-              padding: '0.25rem 0.4rem',
-              borderRadius: '0.25rem',
+            '.hljs': {
+              background: 'transparent',
+              padding: '0',
               fontSize: '0.875em',
-            },
-            'code::before': {
-              content: '""',
-            },
-            'code::after': {
-              content: '""',
             },
           },
         },

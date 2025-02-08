@@ -19,7 +19,7 @@ export const PostSchema = new mongoose.Schema<IPost>({
   },
   content: {
     type: String,
-    required: [true, 'Please provide content']
+    required: true
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,

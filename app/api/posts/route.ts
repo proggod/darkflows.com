@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { verifySession } from '@/actions/auth';
+import { initDatabase } from '@/lib/db/init';
 
 interface PostDocument {
   _id: string;
@@ -67,15 +68,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await verifySession();
-
-    await connectDB();
+    await initDatabase();
+    
     const data = await request.json();
+    const contentObj = JSON.parse(data.content);
+    
+    // Calculate reading time from text content
+    const textContent = extractTextFromJson(contentObj);
+    const readingTime = Math.ceil(textContent.split(' ').length / 200);
 
-    // Create the post
     const post = await Post.create({
       ...data,
       author: session.id,
-      readingTime: Math.ceil(data.content.split(' ').length / 200)
+      readingTime
     });
 
     // Fetch the complete post with populated author
@@ -111,4 +116,19 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+// Helper function to extract text from Tiptap JSON
+function extractTextFromJson(json: any): string {
+  if (!json.content) return '';
+  
+  return json.content.reduce((text: string, node: any) => {
+    if (node.type === 'text') {
+      return text + ' ' + node.text;
+    }
+    if (node.content) {
+      return text + ' ' + extractTextFromJson(node);
+    }
+    return text;
+  }, '').trim();
 } 

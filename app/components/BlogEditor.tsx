@@ -60,21 +60,31 @@ export default function BlogEditor({ post }: BlogEditorProps) {
     setError('');
 
     try {
-      const res = await fetch(post ? `/api/posts/${post._id}` : '/api/posts', {
-        method: post ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, category }),
-      });
+      const res = await fetch(
+        post ? `/api/posts/${post._id}` : '/api/posts',
+        {
+          method: post ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            category
+          }),
+        }
+      );
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to save post');
+        throw new Error('Failed to save post');
       }
 
-      router.push('/blog');
+      // Redirect to admin posts page instead of blog
+      router.push('/admin/posts');
       router.refresh();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to save post');
+    } catch (err) {
+      console.error('Save error:', err);
+      setError('Failed to save post');
     } finally {
       setLoading(false);
     }

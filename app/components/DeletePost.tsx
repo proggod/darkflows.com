@@ -21,16 +21,22 @@ export default function DeletePost({ postId }: DeletePostProps) {
     try {
       const res = await fetch(`/api/posts/${postId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error('Failed to delete post');
+        throw new Error(data.message || 'Failed to delete post');
       }
 
+      router.push('/blog');
       router.refresh();
     } catch (error) {
-      console.error('Delete error:', error);
-      alert('Failed to delete post');
+      console.error('Error deleting post:', error);
+      alert('Failed to delete post. Please try again.');
     } finally {
       setIsDeleting(false);
     }

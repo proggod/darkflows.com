@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
+import RichTextRenderer from './RichTextRenderer';
 
 interface TableOfContentsItem {
   id: string;
@@ -49,6 +52,19 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
     }
   }, [post?.content, post]);
 
+  useEffect(() => {
+    // Initialize syntax highlighting with specific options
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+      languages: ['typescript', 'javascript', 'bash', 'json', 'html', 'css']
+    });
+    
+    // Force highlight all code blocks
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block as HTMLElement);
+    });
+  }, [post.content]);
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -62,10 +78,9 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="w-full max-w-none mx-auto px-4 py-8">
       <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-        {/* Main content */}
-        <article className="col-span-3">
+        <article className="col-span-3 min-w-0 w-full">
           {post.coverImage && (
             <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">
               <Image
@@ -99,10 +114,7 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
             </div>
           </header>
 
-          <div 
-            className="prose prose-invert prose-lg max-w-none [&_h1]:mt-0 [&_h1]:mb-0 [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:mt-4 [&_h3]:mb-2 [&_h1,&_h2,&_h3]:scroll-mt-24"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <RichTextRenderer content={post.content} />
 
           {isPreview && (
             <div className="mt-8 flex gap-4">

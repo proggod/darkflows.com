@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import TopNavBar from '@/components/TopNavBar';
+import TopNavBar from '@/app/components/TopNavBar';
 import { FaCopy } from 'react-icons/fa';
 
 export default function DownloadPage() {

@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-import BlogPost from '@/components/BlogPost';
+import BlogPost from '@/app/components/BlogPost';
 import { verifySession } from '@/actions/auth';
 import Link from 'next/link';
-import BlogEditor from '@/components/BlogEditor';
+import BlogEditor from '@/app/components/BlogEditor';
 import { formatDate } from '@/lib/format';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';

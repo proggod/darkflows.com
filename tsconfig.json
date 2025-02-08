@@ -21,9 +21,10 @@
     "paths": {
       "@/*": ["./*"],
       "@/actions/*": ["./app/actions/*"],
-      "@/components/*": ["./components/*"],
+      "@/app/components/*": ["./app/components/*"],
       "@/lib/*": ["./lib/*"],
-      "@/models/*": ["./models/*"]
+      "@/models/*": ["./models/*"],
+      "@/app/*": ["./app/*"]
     }
   },
   "include": [

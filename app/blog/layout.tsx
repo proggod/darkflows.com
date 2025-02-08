@@ -1,5 +1,5 @@
 import { verifySession } from '@/actions/auth';
-import AdminNav from '@/components/AdminNav';
+import AdminNav from '@/app/components/AdminNav';
 
 export default async function BlogLayout({
   children,

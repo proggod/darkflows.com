@@ -1,6 +1,6 @@
 import { verifySession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
-import BlogEditor from '@/components/BlogEditor';
+import BlogEditor from '@/app/components/BlogEditor';
 
 export default async function NewBlogPost() {
   const session = await verifySession();

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import AdminNav from '@/components/AdminNav';
+import AdminNav from '@/app/components/AdminNav';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { verifySession } from '@/lib/session';

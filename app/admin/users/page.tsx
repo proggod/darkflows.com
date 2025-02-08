@@ -1,6 +1,6 @@
 import { verifySession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
-import UserManager from '../../../components/UserManager';
+import UserManager from '@/app/components/UserManager';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import type { Types } from 'mongoose';

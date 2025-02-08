@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import TopNavBar from '@/components/TopNavBar';
+import TopNavBar from '@/app/components/TopNavBar';
 
 interface CO2Data {
   country: string;

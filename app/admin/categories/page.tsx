@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { verifySession } from '@/lib/session';
 import { redirect } from 'next/navigation';
-import CategoryManager from '../../../components/CategoryManager';
+import CategoryManager from '@/app/components/CategoryManager';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
 import type { Types } from 'mongoose';

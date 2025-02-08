@@ -5,7 +5,7 @@ import { verifySession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import UserManager from '../../../components/UserManager';
+import UserManager from '@/app/components/UserManager';
 import type { Types } from 'mongoose';
 import { isBuildTime } from '@/lib/buildUtils';
 import { getMockDataServer } from '@/lib/utils';

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-import BlogEditor from '@/components/BlogEditor';
+import BlogEditor from '@/app/components/BlogEditor';
 import { verifySession } from '@/lib/session';
 
 interface Props {

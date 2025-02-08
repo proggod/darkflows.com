@@ -1,9 +1,9 @@
-import FeatureCarousel from '@/components/FeatureCarousel';
-import ScrollReveal from '@/components/ScrollReveal';
-import DataConnectSection from '@/components/DataConnectSection';
-import TopNavBar from '@/components/TopNavBar';
-import FAQ from '@/components/FAQ';
-// import Footer from '@/components/Footer';
+import FeatureCarousel from '@/app/components/FeatureCarousel';
+import ScrollReveal from '@/app/components/ScrollReveal';
+import DataConnectSection from '@/app/components/DataConnectSection';
+import TopNavBar from '@/app/components/TopNavBar';
+import FAQ from '@/app/components/FAQ';
+// import Footer from '@/app/components/Footer';
 import siteContent from '@/data/site-content.json';
 import { SiteContent } from '@/types';
 // import VideoTutorials from './components/VideoTutorials'

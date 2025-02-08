@@ -23,13 +23,16 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  server: {
+    hostname: '0.0.0.0',
+    port: 3050,
+    allowHostnames: ['*'],
+  },
   serverRuntimeConfig: {
     mongodb: {
       uri: process.env.MONGODB_URI
     }
   },
-  hostname: '0.0.0.0',
-  port: 3050
 };
 
 export default nextConfig;

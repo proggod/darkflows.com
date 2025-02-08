@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import BlogPost from '@/app/components/BlogPost';
@@ -64,7 +64,9 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { edit } = await searchParams;
   const isEditing = edit === 'true';
-  const session = await verifySession();
+  
+  // Only verify session if we're editing
+  const session = isEditing ? await verifySession() : null;
   
   try {
     await connectDB();
@@ -75,6 +77,11 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
 
     if (!post) {
       notFound();
+    }
+
+    // If trying to edit without admin rights, redirect
+    if (isEditing && (!session || session.role !== 'admin')) {
+      redirect('/login');
     }
 
     // Serialize for BlogEditor when editing

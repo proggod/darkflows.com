@@ -1,6 +1,17 @@
 import mongoose from 'mongoose';
 
-const PostSchema = new mongoose.Schema({
+export interface IPost {
+  title: string;
+  content: string;
+  author: mongoose.Types.ObjectId;
+  category: mongoose.Types.ObjectId;
+  coverImage?: string;
+  readingTime: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const PostSchema = new mongoose.Schema<IPost>({
   title: {
     type: String,
     required: [true, 'Please provide a title'],
@@ -26,16 +37,10 @@ const PostSchema = new mongoose.Schema({
   },
   readingTime: {
     type: Number,
-    required: false
+    required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+}, {
+  timestamps: true
 });
 
 export default mongoose.models.Post || mongoose.model('Post', PostSchema); 

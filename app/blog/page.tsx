@@ -6,9 +6,10 @@ import Category from '@/models/Category';
 import { verifySession } from '@/lib/session';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';
+import { registerModels } from '@/lib/db/init';
 
-interface Category {
-  _id: string;
+interface Category extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   slug: string;
 }
@@ -47,6 +48,9 @@ interface MongoPost extends FlattenMaps<Document> {
 }
 
 async function getPosts(categoryName?: string): Promise<Post[]> {
+  // Register models before using them
+  registerModels();
+  
   await connectDB();
   
   let query = {};
@@ -97,7 +101,7 @@ async function getCategories(): Promise<Category[]> {
   return [
     { _id: 'all', name: 'All', slug: 'all' },
     ...categories.map(cat => ({
-      _id: cat._id.toString(),
+      _id: cat._id?.toString() || '',
       name: cat.name,
       slug: cat.slug
     }))

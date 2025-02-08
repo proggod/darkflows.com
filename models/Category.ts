@@ -1,33 +1,21 @@
 import mongoose from 'mongoose';
 
-const categorySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please provide a category name'],
-    unique: true,
-    trim: true,
-    maxlength: [50, 'Category name cannot be more than 50 characters']
-  },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true
-  },
-  description: {
-    type: String,
-    maxlength: [200, 'Description cannot be more than 200 characters']
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+export interface ICategory {
+  name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const CategorySchema = new mongoose.Schema<ICategory>({
+  name: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
 }, {
   timestamps: true
 });
 
 // Add pre-save hook to generate slug if not provided
-categorySchema.pre('save', function(next) {
+CategorySchema.pre('save', function(next) {
   if (!this.slug) {
     this.slug = this.name.toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -36,6 +24,6 @@ categorySchema.pre('save', function(next) {
   next();
 });
 
-const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
+const Category = mongoose.models.Category || mongoose.model('Category', CategorySchema);
 
 export default Category; 

@@ -16,10 +16,11 @@ services:
     volumes:
       - uploads_data:/app/public/uploads
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3050"]
+      test: ["CMD", "curl", "-f", "http://localhost:3050/api/debug"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
     logging:
       driver: "json-file"
       options:

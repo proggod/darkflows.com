@@ -25,6 +25,9 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
+# Add curl for healthcheck
+RUN apk add --no-cache curl
+
 # Set production environment variables
 ENV NODE_ENV=production
 ENV PORT=3050

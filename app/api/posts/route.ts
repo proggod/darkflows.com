@@ -23,8 +23,27 @@ export async function GET() {
     await connectDB();
     const posts = await Post.find({})
       .populate('author', 'name email')
-      .sort({ createdAt: -1 });
-    return NextResponse.json({ posts });
+      .populate('category', 'name slug')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Serialize the MongoDB documents
+    const serializedPosts = posts.map(post => ({
+      ...post,
+      _id: post._id.toString(),
+      author: {
+        ...post.author,
+        _id: post.author._id.toString()
+      },
+      category: post.category ? {
+        ...post.category,
+        _id: post.category._id.toString()
+      } : null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString()
+    }));
+
+    return NextResponse.json({ posts: serializedPosts });
   } catch (err) {
     console.error('Failed to fetch posts:', err);
     return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });

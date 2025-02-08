@@ -12,19 +12,37 @@ interface RouteContext {
 // Get single post
 export async function GET(
   request: Request,
-  context: RouteContext
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = params;
     await connectDB();
     const post = await Post.findById(id)
-      .populate('author', 'name email');
+      .populate('author', 'name email')
+      .populate('category', 'name slug')
+      .lean();
 
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    return NextResponse.json(post);
+    // Serialize the MongoDB document
+    const serializedPost = {
+      ...post,
+      _id: post._id.toString(),
+      author: {
+        ...post.author,
+        _id: post.author._id.toString()
+      },
+      category: post.category ? {
+        ...post.category,
+        _id: post.category._id.toString()
+      } : null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString()
+    };
+
+    return NextResponse.json(serializedPost);
   } catch (err) {
     console.error('Failed to fetch post:', err);
     return NextResponse.json(

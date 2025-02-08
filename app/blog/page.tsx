@@ -26,20 +26,23 @@ async function getPosts(category?: string): Promise<Post[]> {
   
   const posts = await Post.find(query)
     .populate('author', 'name email')
+    .populate('category', 'name slug')
     .sort({ createdAt: -1 })
-    .lean() as any[];
+    .lean();
 
   return posts.map(post => ({
     ...post,
     _id: post._id.toString(),
     author: post.author ? {
-      ...post.author,
-      _id: post.author._id?.toString(),
-    } : {
-      _id: 'deleted',
-      name: 'Deleted User',
-      email: '',
-    },
+      _id: post.author._id.toString(),
+      name: String(post.author.name),
+      email: String(post.author.email)
+    } : null,
+    category: post.category ? {
+      _id: post.category._id.toString(),
+      name: String(post.category.name),
+      slug: String(post.category.slug)
+    } : null,
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
   }));
@@ -120,7 +123,7 @@ export default async function BlogPage({ searchParams }: Props) {
               <div className="p-4">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
                   <span className="px-2 py-1 bg-gray-800 rounded">
-                    {post.category}
+                    {post.category?.name}
                   </span>
                   <span>•</span>
                   <span>{post.readingTime} min read</span>
@@ -132,10 +135,10 @@ export default async function BlogPage({ searchParams }: Props) {
 
                 <div className="flex items-center gap-2 mt-4">
                   <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm">
-                    {post.author.name[0].toUpperCase()}
+                    {post.author?.name[0].toUpperCase()}
                   </div>
                   <div className="text-sm text-gray-400">
-                    {post.author.name}
+                    {post.author?.name}
                   </div>
                 </div>
               </div>

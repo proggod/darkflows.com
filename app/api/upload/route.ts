@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/actions/auth';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
 export async function POST(request: Request) {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('image') as File;
+    const file = formData.get('file') as File;
     
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -28,7 +28,15 @@ export async function POST(request: Request) {
     
     // Ensure uploads directory exists
     const uploadDir = path.join(process.cwd(), 'public/uploads');
-    await writeFile(path.join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (err) {
+      // Directory might already exist, that's fine
+    }
+
+    // Write file to uploads directory
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(path.join(uploadDir, filename), buffer);
 
     return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (err) {

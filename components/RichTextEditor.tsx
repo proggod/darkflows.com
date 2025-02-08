@@ -21,11 +21,18 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
-
+  const [uploading, setUploading] = useState(false);
+  
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        heading: {
+          levels: [1, 2, 3],
+          HTMLAttributes: {
+            class: 'no-spacing',
+          },
+        },
       }),
       Image.configure({
         HTMLAttributes: {
@@ -42,43 +49,19 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert min-h-[200px] max-w-none w-full p-4 focus:outline-none',
+        class: 'prose prose-invert min-h-[200px] max-w-none w-full p-4 focus:outline-none [&_.no-spacing]:m-0 [&_.no-spacing]:p-0',
       },
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    immediatelyRender: false
   });
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleImageUpload = useCallback(async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const data = await res.json();
-      return data.url;
-    } catch (err) {
-      console.error('Image upload failed:', err);
-      return null;
-    }
-  }, []);
-
   const addImage = useCallback(async () => {
-    // Create a hidden file input
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -87,22 +70,39 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
-      const imageUrl = await handleImageUpload(file);
-      if (imageUrl) {
-        editor?.chain().focus().setImage({ src: imageUrl }).run();
+      try {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const { url } = await response.json();
+        editor?.chain().focus().setImage({ src: url }).run();
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('Failed to upload image');
+      } finally {
+        setUploading(false);
       }
     };
 
-    // Trigger file selection
     input.click();
-  }, [editor, handleImageUpload]);
+  }, [editor]);
 
-  const addLink = () => {
-    const url = window.prompt('Enter URL');
+  const addLink = useCallback(() => {
+    const url = window.prompt('Enter the URL:');
     if (url) {
       editor?.chain().focus().setLink({ href: url }).run();
     }
-  };
+  }, [editor]);
 
   if (!isMounted) {
     return (
@@ -133,11 +133,27 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
         <button
           type="button"
-          onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`p-2 rounded ${editor?.isActive('heading') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-          title="Heading"
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={`p-2 rounded ${editor?.isActive('heading', { level: 1 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+          title="Heading 1"
         >
-          <Heading2 size={16} />
+          H1
+        </button>
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={`p-2 rounded ${editor?.isActive('heading', { level: 2 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+          title="Heading 2"
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+          className={`p-2 rounded ${editor?.isActive('heading', { level: 3 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+          title="Heading 3"
+        >
+          H3
         </button>
         <button
           type="button"
@@ -183,4 +199,4 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       <EditorContent editor={editor} />
     </div>
   );
-} 
+}

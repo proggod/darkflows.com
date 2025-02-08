@@ -17,22 +17,10 @@ export default function ResetPage() {
       return;
     }
 
-    console.log('Attempting reset with password:', password === process.env.NEXT_PUBLIC_RESET_PASSWORD);
-    
-    if (password !== process.env.NEXT_PUBLIC_RESET_PASSWORD) {
-      console.error('Password mismatch:', { 
-        given: password,
-        expected: process.env.NEXT_PUBLIC_RESET_PASSWORD 
-      });
-      setError('Invalid reset password');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
     try {
-      console.log('Sending reset request...');
       const res = await fetch('/api/admin/reset', {
         method: 'POST',
         headers: { 
@@ -41,21 +29,13 @@ export default function ResetPage() {
         body: JSON.stringify({ password })
       });
 
-      console.log('Reset response:', { 
-        status: res.status,
-        ok: res.ok 
-      });
-
       if (!res.ok) {
         const data = await res.json();
-        console.error('Reset failed:', data);
         throw new Error(data.error || 'Failed to reset database');
       }
 
-      console.log('Reset successful, redirecting to setup...');
       router.push('/setup');
     } catch (err) {
-      console.error('Reset error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);

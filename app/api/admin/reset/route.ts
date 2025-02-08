@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     
     const { password } = await request.json();
     
-    if (password !== process.env.NEXT_PUBLIC_RESET_PASSWORD) {
+    if (password !== process.env.RESET_PASSWORD) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 403 });
     }
 

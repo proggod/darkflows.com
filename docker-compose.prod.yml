@@ -29,6 +29,7 @@ services:
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://admin:darkflows@mongodb:27018/darkflows?authSource=admin
+      - RESET_PASSWORD=${RESET_PASSWORD}
 
   mongodb:
     image: mongo:latest

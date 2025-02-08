@@ -7,8 +7,8 @@ export const runtime = 'nodejs';
 // List of paths that require authentication
 const protectedPaths = [
   '/admin',
-  '/blog/new',
-  '/blog/edit',
+  '/admin/posts/new',
+  '/admin/posts/edit',
   '/api/admin/:path*',
   '/api/upload'
 ];
@@ -61,8 +61,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/admin/:path*',
-    '/blog/new',
-    '/blog/edit/:path*',
+    '/admin/posts/new',
+    '/admin/posts/edit/:path*',
     '/api/admin/:path*',
     '/api/upload'
   ]

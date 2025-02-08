@@ -6,6 +6,9 @@ import { redirect } from 'next/navigation';
 import { isBuildTime } from '@/lib/buildUtils';
 import Link from 'next/link';
 import { Users, FileText, Tag, UserCheck } from 'lucide-react';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
+import Post from '@/models/Post';
 
 const adminActions = [
   {
@@ -19,7 +22,7 @@ const adminActions = [
     title: 'Blog Posts',
     description: 'Create and manage blog posts',
     icon: FileText,
-    href: '/blog/new',
+    href: '/admin/posts',
     color: 'bg-green-500'
   },
   {
@@ -49,6 +52,13 @@ export default async function AdminPage() {
     redirect('/login');
   }
 
+  await connectDB();
+  const [totalUsers, totalPosts, pendingApprovals] = await Promise.all([
+    User.countDocuments({}).exec(),
+    Post.countDocuments({}).exec(),
+    User.countDocuments({ approved: false }).exec()
+  ]);
+
   return (
     <div className="max-w-7xl mx-auto px-4">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
@@ -76,15 +86,15 @@ export default async function AdminPage() {
       <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-800 rounded-lg p-6">
           <h3 className="text-lg font-medium mb-2">Total Users</h3>
-          <p className="text-3xl font-bold">-</p>
+          <p className="text-3xl font-bold">{totalUsers || 0}</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-6">
           <h3 className="text-lg font-medium mb-2">Blog Posts</h3>
-          <p className="text-3xl font-bold">-</p>
+          <p className="text-3xl font-bold">{totalPosts || 0}</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-6">
           <h3 className="text-lg font-medium mb-2">Pending Approvals</h3>
-          <p className="text-3xl font-bold">-</p>
+          <p className="text-3xl font-bold">{pendingApprovals || 0}</p>
         </div>
       </div>
     </div>

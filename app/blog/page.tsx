@@ -2,11 +2,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
+import Category from '@/models/Category';
 import { verifySession } from '@/lib/session';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';
 
-const CATEGORIES = ['All', 'Tutorial', 'News', 'Release', 'Guide', 'Other'];
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+}
 
 interface Post {
   _id: string;
@@ -41,9 +46,19 @@ interface MongoPost extends FlattenMaps<Document> {
   createdAt: Date;
 }
 
-async function getPosts(category?: string): Promise<Post[]> {
+async function getPosts(categoryName?: string): Promise<Post[]> {
   await connectDB();
-  const query = category && category !== 'All' ? { category } : {};
+  
+  let query = {};
+  
+  if (categoryName && categoryName !== 'All') {
+    // First find the category by name
+    const category = await Category.findOne({ name: categoryName }).lean();
+    if (category) {
+      // Then use the category's _id in the post query
+      query = { category: category._id };
+    }
+  }
   
   const posts = (await Post.find(query)
     .populate('author', 'name email')
@@ -74,6 +89,21 @@ async function getSession() {
   }
 }
 
+async function getCategories(): Promise<Category[]> {
+  await connectDB();
+  const categories = await Category.find().lean();
+  
+  // Add "All" as the first category
+  return [
+    { _id: 'all', name: 'All', slug: 'all' },
+    ...categories.map(cat => ({
+      _id: cat._id.toString(),
+      name: cat.name,
+      slug: cat.slug
+    }))
+  ];
+}
+
 interface Props {
   searchParams: Promise<{
     category?: string;
@@ -82,9 +112,9 @@ interface Props {
 
 export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
-  const [posts, session] = await Promise.all([
+  const [posts, categories] = await Promise.all([
     getPosts(params.category),
-    getSession()
+    getCategories()
   ]);
 
   return (
@@ -93,30 +123,21 @@ export default async function BlogPage({ searchParams }: Props) {
         <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold">Blog Posts</h1>
           <div className="flex gap-2">
-            {CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <Link
-                key={category}
-                href={`/blog${category === 'All' ? '' : `?category=${category}`}`}
+                key={category._id}
+                href={`/blog${category.slug === 'all' ? '' : `?category=${category.name}`}`}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  params.category === category || (!params.category && category === 'All')
+                  params.category === category.name || (!params.category && category.slug === 'all')
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-800 hover:bg-gray-700'
                 }`}
               >
-                {category}
+                {category.name}
               </Link>
             ))}
           </div>
         </div>
-
-        {session && (
-          <Link
-            href="/blog/new"
-            className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500"
-          >
-            New Post
-          </Link>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

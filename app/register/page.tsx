@@ -5,63 +5,63 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function RegisterPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirmPassword');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
+    const formData = new FormData(event.currentTarget);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      password: formData.get('password'),
+    };
 
     try {
-      // First register
-      const registerRes = await fetch('/api/auth/register', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify(data),
       });
 
-      if (!registerRes.ok) {
-        const data = await registerRes.json();
-        throw new Error(data.error || 'Registration failed');
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Registration failed');
       }
 
-      // Then login - Add better error handling
-      const loginRes = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const loginData = await loginRes.json();
-
-      if (!loginRes.ok) {
-        console.error('Login response:', loginData);
-        throw new Error(loginData.error || 'Login after registration failed');
-      }
-
-      router.push('/blog');
-      router.refresh();
-    } catch (err) {
-      console.error('Registration/Login error:', err);
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setIsRegistered(true);
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert(error instanceof Error ? error.message : 'Registration failed');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
+  }
+
+  if (isRegistered) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="max-w-md w-full space-y-8 p-8 bg-gray-800 rounded-lg shadow-lg">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">Registration Successful!</h2>
+            <p className="text-gray-300 mb-8">
+              Your account has been created and is pending approval. You will receive an email when your account is approved.
+            </p>
+            <button
+              onClick={() => router.push('/login')}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Return to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
@@ -70,12 +70,6 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-bold">Create Account</h1>
           <p className="text-gray-400">Join our community</p>
         </div>
-
-        {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -118,26 +112,12 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-400">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              id="confirmPassword"
-              required
-              minLength={8}
-              className="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
           <button
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Creating account...' : 'Register'}
+            {isSubmitting ? 'Creating account...' : 'Register'}
           </button>
         </form>
 

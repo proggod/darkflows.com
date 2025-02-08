@@ -26,7 +26,7 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 # Add curl for healthcheck
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl python3 make g++
 
 # Set production environment variables
 ENV NODE_ENV=production

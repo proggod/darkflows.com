@@ -1,27 +1,35 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { login } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
+// Define our state type
 interface LoginState {
   error?: string;
-  success?: boolean;
+  success: boolean;
   redirectTo?: string;
 }
 
 export default function LoginPage() {
   const router = useRouter();
-  const [state, formAction] = useFormState(login, { 
-    error: undefined 
-  } as LoginState);
+  const [state, formAction, isPending] = useActionState<LoginState>(
+    login,
+    {
+      error: undefined,
+      success: false,
+      redirectTo: undefined,
+    }
+  );
 
-  // Handle successful login
-  if (state?.success) {
-    router.push(state.redirectTo || '/');
-    return null;
-  }
+  // Handle successful login with useEffect
+  useEffect(() => {
+    if (state?.success) {
+      router.push(state.redirectTo || '/');
+    }
+  }, [state?.success, state?.redirectTo, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
@@ -66,9 +74,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
+            disabled={isPending}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            Login
+            {isPending ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
@@ -81,4 +90,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}

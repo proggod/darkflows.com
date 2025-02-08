@@ -61,7 +61,19 @@ export const verifySession = cache(async () => {
   }
 })
 
-export async function login(prevState: unknown, formData: FormData) {
+// Define our state type
+interface LoginState {
+  error?: string;
+  success: boolean;
+  redirectTo?: string;
+}
+
+export async function login(
+  state: LoginState,
+  formData?: FormData
+): Promise<LoginState> {
+  if (!formData) return state;
+  
   try {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
@@ -96,4 +108,11 @@ export async function login(prevState: unknown, formData: FormData) {
     console.error('Login error:', error)
     return { error: 'Authentication failed' }
   }
+}
+
+export async function logout() {
+  'use server'
+  const cookieStore = await cookies()
+  await cookieStore.delete('session')
+  redirect('/login')
 } 

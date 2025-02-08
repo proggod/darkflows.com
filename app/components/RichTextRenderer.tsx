@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react';
 import hljs from 'highlight.js/lib/core';
 import typescript from 'highlight.js/lib/languages/typescript';
+import python from 'highlight.js/lib/languages/python';
+import ruby from 'highlight.js/lib/languages/ruby';
+import go from 'highlight.js/lib/languages/go';
+import rust from 'highlight.js/lib/languages/rust';
+import java from 'highlight.js/lib/languages/java';
+import c from 'highlight.js/lib/languages/c';
+import cpp from 'highlight.js/lib/languages/cpp';
 import 'highlight.js/styles/github-dark.css';
 
 interface Node {
@@ -38,6 +45,13 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
   // Initialize highlight.js
   useEffect(() => {
     hljs.registerLanguage('typescript', typescript);
+    hljs.registerLanguage('cpp', cpp);
+    hljs.registerLanguage('c', c);
+    hljs.registerLanguage('python', python);
+    hljs.registerLanguage('ruby', ruby);
+    hljs.registerLanguage('go', go);
+    hljs.registerLanguage('rust', rust);
+    hljs.registerLanguage('java', java);
   }, []);
 
   // Add copy handler

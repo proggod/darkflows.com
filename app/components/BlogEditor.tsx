@@ -91,7 +91,7 @@ export default function BlogEditor({ post }: BlogEditorProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl mx-auto">
       {error && (
         <div className="p-3 bg-red-500/10 border border-red-500 rounded text-red-500">
           {error}
@@ -99,23 +99,23 @@ export default function BlogEditor({ post }: BlogEditorProps) {
       )}
 
       <div>
-        <label className="block text-sm font-medium mb-1">Title</label>
+        <label className="block text-sm font-medium mb-2">Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full px-4 py-2 bg-gray-800 rounded-md"
+          className="w-full px-4 py-2 bg-gray-800 rounded-md border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Category</label>
+        <label className="block text-sm font-medium mb-2">Category</label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           required
-          className="w-full px-4 py-2 bg-gray-800 rounded-md"
+          className="w-full px-4 py-2 bg-gray-800 rounded-md border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         >
           <option value="">Select a category</option>
           {categories.map((cat) => (
@@ -127,14 +127,14 @@ export default function BlogEditor({ post }: BlogEditorProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Content</label>
+        <label className="block text-sm font-medium mb-2">Content</label>
         <RichTextEditor content={content} onChange={setContent} />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 disabled:opacity-50"
+        className="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-500 disabled:opacity-50 font-medium"
       >
         {loading ? 'Saving...' : post ? 'Update Post' : 'Create Post'}
       </button>

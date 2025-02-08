@@ -21,8 +21,9 @@ export async function middleware(request: NextRequest) {
 
   console.log('Environment:', process.env.NODE_ENV);
   
-  // Skip auth check in development for testing
-  if (process.env.NODE_ENV === 'development') {
+  // List of public paths that don't need auth
+  const publicPaths = ['/blog', '/api/posts'];
+  if (publicPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
     return NextResponse.next();
   }
 

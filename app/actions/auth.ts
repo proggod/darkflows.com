@@ -7,6 +7,17 @@ import User from '@/models/User'
 import connectDB from '@/lib/mongodb'
 import { cache } from 'react'
 
+// Near the top of the file
+console.log('Auth environment check:', {
+  nodeEnv: process.env.NODE_ENV,
+  jwtSecret: {
+    exists: !!process.env.JWT_SECRET,
+    length: process.env.JWT_SECRET?.length,
+    firstChar: process.env.JWT_SECRET?.[0],
+    lastChar: process.env.JWT_SECRET?.[process.env.JWT_SECRET.length - 1]
+  }
+});
+
 // Helper function to set session cookie
 async function setSessionCookie(token: string) {
   'use server'

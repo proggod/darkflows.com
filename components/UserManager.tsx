@@ -30,11 +30,12 @@ export default function UserManager({ initialUsers }: UserManagerProps) {
 
       if (!res.ok) throw new Error('Failed to update role');
 
-      const updatedUser = await res.json();
+      const _updatedUser = await res.json();
       setUsers(users.map(user => 
-        user._id === userId ? { ...user, role: updatedUser.role } : user
+        user._id === userId ? { ...user, role: newRole } : user
       ));
-    } catch (err) {
+    } catch (error) {
+      console.error('Failed to update role:', error);
       setError('Failed to update user role');
     }
   };
@@ -47,11 +48,11 @@ export default function UserManager({ initialUsers }: UserManagerProps) {
 
       if (!res.ok) throw new Error('Failed to approve user');
 
-      const updatedUser = await res.json();
       setUsers(users.map(user => 
         user._id === userId ? { ...user, approved: true } : user
       ));
-    } catch (err) {
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
       setError('Failed to approve user');
     }
   };

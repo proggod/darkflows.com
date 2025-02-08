@@ -4,10 +4,11 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Link from '@tiptap/extension-link';
 import { common, createLowlight } from 'lowlight'
 import { useEffect, useState, useCallback } from 'react';
 import { 
-  Bold, Italic, Heading2, List, Image as ImageIcon, 
+  Bold, Italic, List, ImageIcon, 
   Code, Link2, Quote
 } from 'lucide-react';
 
@@ -21,7 +22,7 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [_uploading, setUploading] = useState(false);
   
   const editor = useEditor({
     extensions: [
@@ -44,6 +45,9 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         HTMLAttributes: {
           class: 'rounded-md bg-gray-900 p-4',
         },
+      }),
+      Link.configure({
+        openOnClick: false,
       }),
     ],
     content,
@@ -97,10 +101,10 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     input.click();
   }, [editor]);
 
-  const addLink = useCallback(() => {
+  const setLink = useCallback(() => {
     const url = window.prompt('Enter the URL:');
     if (url) {
-      editor?.chain().focus().setLink({ href: url }).run();
+      editor?.chain().focus().toggleLink({ href: url }).run();
     }
   }, [editor]);
 
@@ -181,7 +185,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </button>
         <button
           type="button"
-          onClick={addLink}
+          onClick={setLink}
           className={`p-2 rounded ${editor?.isActive('link') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
           title="Add Link"
         >

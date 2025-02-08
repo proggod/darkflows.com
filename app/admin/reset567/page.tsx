@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 // No auth check - this is intentionally public
+export const dynamic = 'force-dynamic';
+
+interface ResetPageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export default function ResetPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

@@ -2,19 +2,19 @@ import { NextResponse } from 'next/server';
 import { verifySession } from '@/actions/auth';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { NextRequest } from 'next/server';
 
 interface UserDocument {
-  _id: any;
+  _id: string;
   name: string;
   email: string;
   role: string;
   approved: boolean;
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+
   try {
     const session = await verifySession();
     if (session.role !== 'admin') {
@@ -23,7 +23,7 @@ export async function POST(
 
     await connectDB();
     const user = await User.findByIdAndUpdate(
-      params.id,
+      id,
       { approved: true },
       { new: true }
     ).lean() as unknown as UserDocument;
@@ -36,8 +36,8 @@ export async function POST(
       ...user,
       _id: user._id.toString()
     });
-  } catch (err) {
-    console.error('Failed to approve user:', err);
+  } catch (error) {
+    console.error('Failed to approve user:', error);
     return NextResponse.json({ error: 'Failed to approve user' }, { status: 500 });
   }
 } 

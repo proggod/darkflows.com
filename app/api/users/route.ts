@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { verifySession } from '@/actions/auth';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
   try {
-    const session = await verifySession();
+    const _session = await verifySession();
     
     await connectDB();
-    const users = await User.find().sort({ createdAt: -1 }).lean();
+    const users = await User.find().sort({ createdAt: -1 }).lean() as unknown as Array<{ _id: string; createdAt: Date }>;
 
     return NextResponse.json(users.map(user => ({
       ...user,
@@ -16,13 +17,13 @@ export async function GET() {
       password: undefined,
       createdAt: user.createdAt.toISOString()
     })));
-  } catch (err) {
-    console.error('Failed to fetch users:', err);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await verifySession();
     if (session.role !== 'admin') {
@@ -41,8 +42,8 @@ export async function POST(request: Request) {
       _id: user._id.toString(),
       password: undefined
     }, { status: 201 });
-  } catch (err) {
-    console.error('Failed to create user:', err);
+  } catch (error) {
+    console.error('Failed to create user:', error);
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
 } 

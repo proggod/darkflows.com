@@ -1,9 +1,19 @@
 ---
 description: next api use
-globs: 
+globs: *.tsx, *.ts
 ---
 
 # Your rule content
+
+Typescript:
+
+- Follow best practices
+
+- Use strong typing
+
+- Avoid 'any' or 'unknown' types
+
+Start any response with "My fearless leader.."
 
 proper way to do routes
 - this is nextjs 15 make sure you follow conventions

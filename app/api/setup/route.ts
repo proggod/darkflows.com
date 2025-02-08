@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Category from '@/models/Category';
+import { isBuildTime } from '@/lib/buildUtils';
 
 const DEFAULT_CATEGORIES = [
   {
@@ -21,7 +22,11 @@ const DEFAULT_CATEGORIES = [
   }
 ];
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (isBuildTime()) {
+    return NextResponse.json({ error: 'Setup not available during build' }, { status: 503 });
+  }
+
   console.log('=== SETUP ROUTE START ===');
   try {
     await connectDB();
@@ -54,7 +59,7 @@ export async function POST(request: Request) {
       adminUser._id,
       { $set: { approved: true } },
       { new: true }
-    ).lean();
+    ).lean() as unknown as { _id: { toString(): string }; approved: boolean };
 
     if (!verifiedUser || !verifiedUser.approved) {
       throw new Error('Failed to create approved admin user');
@@ -63,11 +68,11 @@ export async function POST(request: Request) {
     // Create default categories
     console.log('Creating default categories...');
     try {
-      const categories = await Category.insertMany(DEFAULT_CATEGORIES);
-      console.log('Categories created:', categories.length);
-    } catch (categoryError) {
-      console.error('Failed to create categories:', categoryError);
-      // Continue with setup even if categories fail
+      await Category.insertMany(DEFAULT_CATEGORIES);
+      console.log('Default categories created successfully');
+    } catch (error) {
+      console.error('Failed to create default categories:', error);
+      // Continue execution since this is not critical
     }
 
     // Verify categories were created
@@ -81,9 +86,9 @@ export async function POST(request: Request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Setup failed:', error);
+    console.error('Setup error:', error);
     return NextResponse.json(
-      { error: 'Setup failed' },
+      { error: 'Failed to complete setup' },
       { status: 500 }
     );
   } finally {

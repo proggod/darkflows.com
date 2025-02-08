@@ -5,13 +5,21 @@ import { login } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface LoginState {
+  error?: string;
+  success?: boolean;
+  redirectTo?: string;
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const [state, formAction] = useFormState(login, { error: null });
+  const [state, formAction] = useFormState(login, { 
+    error: undefined 
+  } as LoginState);
 
   // Handle successful login
   if (state?.success) {
-    router.push(state.redirectTo);
+    router.push(state.redirectTo || '/');
     return null;
   }
 

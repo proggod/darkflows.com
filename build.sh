@@ -14,8 +14,14 @@ rm -f package-lock.json
 npm install
 
 echo "🔧 Setting up builder..."
-docker buildx create --name darkflows-builder --use || true
-docker buildx inspect --bootstrap
+if ! docker buildx create --name darkflows-builder --use; then
+  echo "⚠️ Failed to create builder, but continuing..."
+fi
+
+if ! docker buildx inspect --bootstrap; then
+  echo "⚠️ Failed to bootstrap builder"
+  exit 1
+fi
 
 # Add environment check and file
 echo "📝 Checking environment files..."

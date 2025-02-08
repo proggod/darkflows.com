@@ -1,6 +1,6 @@
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { SignJWT } from 'jose';
@@ -9,16 +9,16 @@ import { cookies } from 'next/headers';
 // Helper function to set session cookie
 async function setSessionCookie(token: string) {
   'use server'
-  const cookieStore = cookies()
-  await Promise.resolve(cookieStore.set('session', token, {
+  const cookieStore = await cookies();
+  await cookieStore.set('session', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  }))
+  });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   console.log('=== REGISTER ROUTE START ===');
   try {
     await connectDB();

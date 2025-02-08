@@ -1,22 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 
-interface RouteContext {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
 // Get single post
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
-    const { id } = params;
     await connectDB();
+    
     const post = await Post.findById(id)
       .populate('author', 'name email')
       .populate('category', 'name slug')
@@ -26,39 +22,21 @@ export async function GET(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    // Serialize the MongoDB document
-    const serializedPost = {
-      ...post,
-      _id: post._id.toString(),
-      author: {
-        ...post.author,
-        _id: post.author._id.toString()
-      },
-      category: post.category ? {
-        ...post.category,
-        _id: post.category._id.toString()
-      } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString()
-    };
-
-    return NextResponse.json(serializedPost);
-  } catch (err) {
-    console.error('Failed to fetch post:', err);
-    return NextResponse.json(
-      { error: 'Failed to fetch post' },
-      { status: 500 }
-    );
+    return NextResponse.json(post);
+  } catch (error) {
+    console.error('Failed to fetch post:', error);
+    return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 });
   }
 }
 
 // Update post
 export async function PUT(
-  request: Request,
-  context: RouteContext
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
-    const { id } = await context.params;
     const session = await verifySession();
 
     await connectDB();
@@ -84,8 +62,8 @@ export async function PUT(
     ).populate('author', 'name email');
 
     return NextResponse.json(updatedPost);
-  } catch (err) {
-    console.error('Failed to update post:', err);
+  } catch (error) {
+    console.error('Failed to update post:', error);
     return NextResponse.json(
       { error: 'Failed to update post' },
       { status: 500 }
@@ -95,11 +73,12 @@ export async function PUT(
 
 // Delete post
 export async function DELETE(
-  request: Request,
-  context: RouteContext
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
-    const { id } = await context.params;
     const session = await verifySession();
 
     await connectDB();
@@ -115,8 +94,8 @@ export async function DELETE(
 
     await Post.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Post deleted successfully' });
-  } catch (err) {
-    console.error('Failed to delete post:', err);
+  } catch (error) {
+    console.error('Failed to delete post:', error);
     return NextResponse.json(
       { error: 'Failed to delete post' },
       { status: 500 }

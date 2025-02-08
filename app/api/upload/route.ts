@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { verifySession } from '@/actions/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await verifySession();
     if (session.role !== 'admin') {
@@ -30,8 +31,9 @@ export async function POST(request: Request) {
     const uploadDir = path.join(process.cwd(), 'public/uploads');
     try {
       await mkdir(uploadDir, { recursive: true });
-    } catch (err) {
-      // Directory might already exist, that's fine
+    } catch (error) {
+      console.warn('Upload directory creation warning:', error);
+      // Directory might already exist, continue
     }
 
     // Write file to uploads directory

@@ -1,11 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { format, parseISO } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { formatDate } from '@/lib/utils';
 
 interface TableOfContentsItem {
   id: string;
@@ -18,7 +15,7 @@ interface BlogPostProps {
     _id: string;
     title: string;
     content: string;
-    category: string;
+    category?: { name: string; slug: string } | null;
     coverImage?: string;
     author: {
       name: string;
@@ -36,34 +33,27 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
   const [toc, setToc] = useState<TableOfContentsItem[]>([]);
 
   useEffect(() => {
-    // Parse content for headings and add IDs
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(post.content, 'text/html');
-    const headings = doc.querySelectorAll('h1, h2, h3');
-    
-    const tocItems: TableOfContentsItem[] = Array.from(headings).map((heading, index) => {
-      const text = heading.textContent || '';
-      const id = text.toLowerCase().replace(/\s+/g, '-');
-      heading.id = id; // Set the ID on the heading
-      return {
-        id,
-        text,
-        level: parseInt(heading.tagName[1])
-      };
-    });
+    if (post?.content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(post.content, 'text/html');
+      const headings = doc.querySelectorAll('h1, h2, h3');
+      
+      const tocItems = Array.from(headings).map((heading) => {
+        const text = heading.textContent || '';
+        const id = text.toLowerCase().replace(/\s+/g, '-');
+        heading.id = id;
+        return { id, text, level: parseInt(heading.tagName[1]) };
+      });
 
-    // Update the content with the new IDs
-    post.content = doc.body.innerHTML;
-    setToc(tocItems);
-  }, [post.content]);
+      setToc(tocItems);
+    }
+  }, [post?.content, post]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      // Prevent default anchor jump
-      const yOffset = -100; // Adjust this value based on your header height
+      const yOffset = -100;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      
       window.scrollTo({
         top: y,
         behavior: 'smooth'
@@ -89,7 +79,7 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
 
           <header className="mb-8">
             <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-              <span>{post.category?.name || 'Uncategorized'}</span>
+              <span>{typeof post.category === 'object' ? post.category?.name : 'Uncategorized'}</span>
               <span>•</span>
               <span>{post.formattedDate}</span>
               <span>•</span>
@@ -164,4 +154,4 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
       </div>
     </div>
   );
-} 
+}

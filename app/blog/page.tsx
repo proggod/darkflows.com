@@ -3,6 +3,8 @@ import Image from 'next/image';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { verifySession } from '@/lib/session';
+import type { Document, FlattenMaps } from 'mongoose';
+import mongoose from 'mongoose';
 
 const CATEGORIES = ['All', 'Tutorial', 'News', 'Release', 'Guide', 'Other'];
 
@@ -15,36 +17,52 @@ interface Post {
   author: {
     name: string;
     email: string;
-  };
+  } | null;
   readingTime: number;
   createdAt: string;
+}
+
+interface MongoPost extends FlattenMaps<Document> {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  content: string;
+  readingTime: number;
+  author: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    email: string;
+  } | null;
+  category: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    slug: string;
+  } | null;
+  coverImage?: string;
+  createdAt: Date;
 }
 
 async function getPosts(category?: string): Promise<Post[]> {
   await connectDB();
   const query = category && category !== 'All' ? { category } : {};
   
-  const posts = await Post.find(query)
+  const posts = (await Post.find(query)
     .populate('author', 'name email')
     .populate('category', 'name slug')
     .sort({ createdAt: -1 })
-    .lean();
+    .lean()) as unknown as MongoPost[];
 
   return posts.map(post => ({
-    ...post,
     _id: post._id.toString(),
+    title: post.title,
+    content: post.content,
+    readingTime: post.readingTime,
     author: post.author ? {
-      _id: post.author._id.toString(),
       name: String(post.author.name),
       email: String(post.author.email)
     } : null,
-    category: post.category ? {
-      _id: post.category._id.toString(),
-      name: String(post.category.name),
-      slug: String(post.category.slug)
-    } : null,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
+    category: post.category?.name || '',
+    coverImage: post.coverImage,
+    createdAt: post.createdAt.toISOString()
   }));
 }
 
@@ -123,7 +141,7 @@ export default async function BlogPage({ searchParams }: Props) {
               <div className="p-4">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
                   <span className="px-2 py-1 bg-gray-800 rounded">
-                    {post.category?.name}
+                    {post.category}
                   </span>
                   <span>•</span>
                   <span>{post.readingTime} min read</span>

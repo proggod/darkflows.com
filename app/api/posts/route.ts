@@ -6,14 +6,20 @@ import Post from '@/models/Post';
 import { verifySession } from '@/actions/auth';
 
 interface PostDocument {
-  _id: any;
+  _id: string;
   title: string;
   content: string;
   author: {
-    _id: any;
+    _id: string;
     name: string;
     email: string;
   };
+  category?: {
+    _id: string;
+    name: string;
+    slug: string;
+  };
+  readingTime: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,7 +31,15 @@ export async function GET() {
       .populate('author', 'name email')
       .populate('category', 'name slug')
       .sort({ createdAt: -1 })
-      .lean();
+      .lean() as unknown as Array<{
+        _id: { toString(): string };
+        title: string;
+        content: string;
+        author: { _id: { toString(): string }; name: string; email: string };
+        category?: { _id: { toString(): string }; name: string; slug: string };
+        createdAt: Date;
+        updatedAt: Date;
+      }>;
 
     // Serialize the MongoDB documents
     const serializedPosts = posts.map(post => ({
@@ -44,8 +58,8 @@ export async function GET() {
     }));
 
     return NextResponse.json({ posts: serializedPosts });
-  } catch (err) {
-    console.error('Failed to fetch posts:', err);
+  } catch (error) {
+    console.error('Failed to fetch posts:', error);
     return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
   }
 }
@@ -90,8 +104,8 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json(serializedPost, { status: 201 });
-  } catch (err) {
-    console.error('Create post error:', err);
+  } catch (error) {
+    console.error('Create post error:', error);
     return NextResponse.json(
       { error: 'Failed to create post' },
       { status: 500 }

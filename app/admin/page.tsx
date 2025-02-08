@@ -1,4 +1,9 @@
-import { verifySession } from '@/actions/auth';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+import { verifySession } from '@/lib/session';
+import { redirect } from 'next/navigation';
+import { isBuildTime } from '@/lib/buildUtils';
 import Link from 'next/link';
 import { Users, FileText, Tag, UserCheck } from 'lucide-react';
 
@@ -33,8 +38,16 @@ const adminActions = [
   }
 ];
 
-export default async function AdminDashboard() {
+export default async function AdminPage() {
+  if (isBuildTime()) {
+    return null;
+  }
+
   const session = await verifySession();
+  
+  if (session.role !== 'admin') {
+    redirect('/login');
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4">

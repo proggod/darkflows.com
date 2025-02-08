@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  experimental: {
+    serverActions: {
+      enabled: true
+    }
+  },
   images: {
     domains: ['localhost'],
     remotePatterns: [
@@ -17,12 +22,6 @@ const nextConfig: NextConfig = {
       use: ['@svgr/webpack']
     });
     return config;
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-      allowedOrigins: ['*']
-    },
   },
   serverRuntimeConfig: {
     mongodb: {

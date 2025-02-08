@@ -5,10 +5,11 @@ import BlogPost from '@/components/BlogPost';
 import { verifySession } from '@/actions/auth';
 import Link from 'next/link';
 import BlogEditor from '@/components/BlogEditor';
-import { redirect } from 'next/navigation';
 import { formatDate } from '@/lib/format';
+import type { Document, FlattenMaps } from 'mongoose';
+import mongoose from 'mongoose';
 
-interface PostDocument {
+interface _PostDocument {
   _id: string;
   title: string;
   content: string;
@@ -28,57 +29,41 @@ interface PostDocument {
   updatedAt: string;
 }
 
-async function getPost(id: string): Promise<PostDocument> {
-  await connectDB();
-  
-  // Check if the ID is valid MongoDB ObjectId
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    notFound();
-  }
-
-  const post = await Post.findById(id)
-    .populate('author', 'name email')
-    .populate('category', 'name slug')
-    .lean();
-
-  if (!post) {
-    notFound();
-  }
-
-  // Serialize the post data
-  return {
-    ...post,
-    _id: post._id.toString(),
-    author: post.author ? {
-      ...post.author,
-      _id: post.author._id.toString(),
-    } : {
-      _id: 'deleted',
-      name: 'Deleted User',
-      email: '',
-    },
-    category: post.category ? {
-      ...post.category,
-      _id: post.category._id.toString()
-    } : null,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-  };
+// Update PostDocument interface
+interface PostDocument extends FlattenMaps<Document> {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  content: string;
+  author: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    email: string;
+  } | null;
+  category: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    slug: string;
+  } | null;
+  coverImage?: string;
+  readingTime: number;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
 }
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     edit?: string;
-  };
+  }>;
 }
 
 export default async function BlogPostPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const searchParamsResolved = await searchParams;
-  const isEditing = searchParamsResolved.edit === 'true';
+  const { edit } = await searchParams;
+  const isEditing = edit === 'true';
   const session = await verifySession();
   
   try {
@@ -86,23 +71,29 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
     const post = await Post.findById(id)
       .populate('author', 'name email')
       .populate('category', 'name slug')
-      .lean();
+      .lean() as PostDocument;
 
     if (!post) {
       notFound();
     }
 
-    // Serialize the MongoDB document
-    const serializedPost = {
+    // Serialize for BlogEditor when editing
+    const editorPost = {
+      _id: post._id.toString(),
+      title: post.title,
+      content: String(post.content),
+      category: post.category?._id.toString() || ''
+    };
+
+    // Serialize for BlogPost when viewing
+    const blogPost = {
       ...post,
       _id: post._id.toString(),
       author: post.author ? {
-        _id: post.author._id.toString(),
         name: String(post.author.name),
         email: String(post.author.email)
-      } : null,
+      } : { name: 'Unknown', email: '' },
       category: post.category ? {
-        _id: post.category._id.toString(),
         name: String(post.category.name),
         slug: String(post.category.slug)
       } : null,
@@ -115,13 +106,10 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
     return (
       <div className="max-w-4xl mx-auto px-4">
         {isEditing ? (
-          <BlogEditor post={serializedPost} />
+          <BlogEditor post={editorPost} />
         ) : (
           <>
-            <BlogPost 
-              post={serializedPost} 
-              isPreview={session?.role === 'admin'} 
-            />
+            <BlogPost post={blogPost} isPreview={session?.role === 'admin'} />
             {session?.role === 'admin' && (
               <div className="mt-8">
                 <Link 

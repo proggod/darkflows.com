@@ -40,8 +40,8 @@ export default function BlogEditor({ post }: BlogEditorProps) {
         if (!post?.category && data.length > 0) {
           setCategory(data[0]._id);
         }
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
         setError('Failed to load categories');
       }
     }
@@ -73,8 +73,8 @@ export default function BlogEditor({ post }: BlogEditorProps) {
 
       router.push('/blog');
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save post');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to save post');
     } finally {
       setLoading(false);
     }

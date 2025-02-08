@@ -1,6 +1,7 @@
 export const runtime = 'nodejs';
 
 import mongoose from 'mongoose';
+import { isBuildTime } from './buildUtils';
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -14,7 +15,7 @@ declare global {
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
+if (!MONGODB_URI && process.env.NODE_ENV !== 'development' && !isBuildTime()) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env');
 }
 
@@ -25,6 +26,11 @@ if (!global.mongoose) {
 }
 
 async function connectDB() {
+  if (isBuildTime()) {
+    console.log('Skipping DB connection during build/static generation');
+    return null;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -32,18 +38,20 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI!, opts);
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    throw e;
+    console.error('MongoDB connection error:', e);
+    return null;
   }
 
   return cached.conn;

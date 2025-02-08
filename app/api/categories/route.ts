@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { verifySession } from '@/lib/session';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import type { ApiResponse, ApiError } from '@/types/api';
 
 interface CategoryDocument {
-  _id: any;
+  _id: string;
   name: string;
   slug: string;
   description?: string;
@@ -19,7 +20,7 @@ interface SerializedCategory {
   createdAt: string;
 }
 
-export async function GET() {
+export async function GET(): Promise<Response> {
   try {
     await connectDB();
     const categories = await Category.find().sort({ name: 1 }).lean() as unknown as CategoryDocument[];
@@ -33,14 +34,14 @@ export async function GET() {
       createdAt: category.createdAt.toISOString()
     }));
 
-    return NextResponse.json(serializedCategories);
-  } catch (err) {
-    console.error('Failed to fetch categories:', err);
-    return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
+    return NextResponse.json(serializedCategories as ApiResponse);
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+    return NextResponse.json({ error: 'Failed to fetch categories' } as ApiError, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await verifySession();
     

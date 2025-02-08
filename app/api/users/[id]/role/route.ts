@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from '@/actions/auth';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
 interface UserDocument {
-  _id: any;
+  _id: string;
   name: string;
   email: string;
   role: string;
@@ -12,10 +12,8 @@ interface UserDocument {
   createdAt: Date;
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   try {
     const session = await verifySession();
     if (session.role !== 'admin') {
@@ -29,7 +27,7 @@ export async function PUT(
 
     await connectDB();
     const user = await User.findByIdAndUpdate(
-      params.id,
+      id,
       { role },
       { new: true }
     ).lean() as unknown as UserDocument;
@@ -42,8 +40,8 @@ export async function PUT(
       ...user,
       _id: user._id.toString()
     });
-  } catch (err) {
-    console.error('Failed to update user role:', err);
+  } catch (error) {
+    console.error('Failed to update user role:', error);
     return NextResponse.json({ error: 'Failed to update user role' }, { status: 500 });
   }
 } 

@@ -1,30 +1,54 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { verifySession } from '@/actions/auth';
 import { redirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import UserManager from '../../../components/UserManager';
+import type { Types } from 'mongoose';
+import { isBuildTime } from '@/lib/buildUtils';
+import { getMockDataServer } from '@/lib/utils';
 
-async function getPendingUsers() {
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  approved: boolean;
+  createdAt: string;
+}
+
+interface MongoUser extends Omit<User, '_id' | 'createdAt'> {
+  _id: Types.ObjectId;
+  createdAt: Date;
+}
+
+async function getPendingUsers(): Promise<User[]> {
+  if (isBuildTime()) {
+    return getMockDataServer<User[]>([]);
+  }
+
   await connectDB();
   const users = await User.find({ approved: false })
     .sort({ createdAt: -1 })
-    .lean() as unknown as Array<{
-      _id: any;
-      name: string;
-      email: string;
-      role: string;
-      approved: boolean;
-      createdAt: Date;
-    }>;
+    .lean<MongoUser[]>();
   
   return users.map(user => ({
-    ...user,
     _id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    approved: user.approved,
     createdAt: user.createdAt.toISOString()
   }));
 }
 
 export default async function ApprovalsPage() {
+  if (isBuildTime()) {
+    return null;
+  }
+
   const session = await verifySession();
   
   // Only admins can access this page

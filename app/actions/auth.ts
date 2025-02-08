@@ -7,27 +7,22 @@ import User from '@/models/User'
 import connectDB from '@/lib/mongodb'
 import { cache } from 'react'
 
-interface Session {
-  id: string;
-  email: string;
-  name: string;
-  role: 'user' | 'admin';
-}
-
 // Helper function to set session cookie
 async function setSessionCookie(token: string) {
   'use server'
-  const cookieStore = cookies()
-  cookieStore.set('session', token, {
+  const cookieStore = await cookies()
+  await cookieStore.set({
+    name: 'session',
+    value: token,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    path: '/'
   })
 }
 
 export const getSession = cache(async () => {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const token = cookieStore.get('session')
   return token?.value
 })
@@ -49,7 +44,12 @@ export const verifySession = cache(async () => {
     )
 
     // Ensure we only return serializable data
-    const payload = verified.payload as any
+    const payload = verified.payload as {
+      id: string;
+      email: string;
+      name: string;
+      role: string;
+    };
     return {
       id: String(payload.id),
       email: String(payload.email),
@@ -61,7 +61,7 @@ export const verifySession = cache(async () => {
   }
 })
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
   try {
     const email = formData.get('email') as string
     const password = formData.get('password') as string

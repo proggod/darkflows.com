@@ -3,6 +3,8 @@ import { verifySession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
+import { Trash2 } from 'lucide-react';
+import DeletePost from '@/app/components/DeletePost';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,12 +51,15 @@ export default async function AdminPostsPage() {
                   <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              <Link
-                href={`/blog/${post._id}?edit=true`}
-                className="text-blue-400 hover:text-blue-300"
-              >
-                Edit
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/blog/${post._id}?edit=true`}
+                  className="text-blue-400 hover:text-blue-300"
+                >
+                  Edit
+                </Link>
+                <DeletePost postId={post._id.toString()} />
+              </div>
             </div>
           </div>
         ))}

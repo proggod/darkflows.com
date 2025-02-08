@@ -4,17 +4,13 @@ import { jwtVerify } from 'jose'
 
 export const runtime = 'nodejs';
 
-// List of paths that should be accessible without authentication
-const publicPaths = [
-  '/login',
-  '/setup',
-  '/reset567',
-  '/api/reset',
-  '/api/admin/reset',
-  '/api/auth/register',
-  '/api/auth/login',
-  '/api/auth/logout',
-  '/api/debug'
+// List of paths that require authentication
+const protectedPaths = [
+  '/admin',
+  '/blog/new',
+  '/blog/edit',
+  '/api/admin',
+  '/api/upload'
 ];
 
 export async function middleware(request: NextRequest) {
@@ -25,11 +21,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicPath = publicPaths.some(path => 
+  // Check if the current path requires authentication
+  const isProtectedPath = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (isPublicPath) {
+  // If it's not a protected path, allow access
+  if (!isProtectedPath) {
     return NextResponse.next();
   }
 
@@ -53,9 +51,13 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+// Configure which paths should be processed by the middleware
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|public|assets).*)',
-    '/api/:path*'
-  ],
+    '/admin/:path*',
+    '/blog/new',
+    '/blog/edit/:path*',
+    '/api/admin/:path*',
+    '/api/upload'
+  ]
 }; 

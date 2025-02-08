@@ -21,8 +21,29 @@ export function registerModels() {
 
 // Add this function to ensure models are registered and connected
 export async function initDatabase() {
-    registerModels();
-    if (mongoose.connection.readyState !== 1) {
-        await mongoose.connect(process.env.MONGODB_URI as string);
+    try {
+        console.log('Database initialization:', {
+            timestamp: new Date().toISOString(),
+            mongoUri: process.env.MONGODB_URI?.replace(/:[^:@]+@/, ':***@'),
+            connectionState: mongoose.connection.readyState
+        });
+
+        registerModels();
+        
+        if (mongoose.connection.readyState !== 1) {
+            await mongoose.connect(process.env.MONGODB_URI as string);
+            console.log('Database connected:', {
+                timestamp: new Date().toISOString(),
+                newState: mongoose.connection.readyState,
+                models: Object.keys(mongoose.models)
+            });
+        }
+    } catch (error) {
+        console.error('Database connection error:', {
+            timestamp: new Date().toISOString(),
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+        });
+        throw error;
     }
 } 

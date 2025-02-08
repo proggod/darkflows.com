@@ -42,4 +42,6 @@ docker buildx build \
 echo "🧹 Cleaning up builder..."
 docker buildx rm darkflows-builder
 
-echo "✅ Build complete!" 
+echo "✅ Build complete!"
+
+export JWT_SECRET="gfgd09809fd8g90dfg8df09g8gdf098g098" 

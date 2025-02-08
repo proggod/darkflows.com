@@ -61,6 +61,12 @@ export const verifySession = cache(async () => {
   }
 })
 
+// Add this near your login/verification logic
+console.log('JWT_SECRET status:', {
+  exists: !!process.env.JWT_SECRET,
+  length: process.env.JWT_SECRET?.length
+});
+
 // Define our state type
 interface LoginState {
   error?: string;

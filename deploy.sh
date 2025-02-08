@@ -92,9 +92,4 @@ else
 fi
 
 echo "📝 Showing logs..."
-$DOCKER_COMPOSE -f ${COMPOSE_FILE} logs -f darkflows
-
-# Copy your .env.production to the server
-scp .env.production your-server:/path/to/deployment/
-export RESET_PASSWORD=your-very-strong-password-here
-docker-compose -f docker-compose.prod.yml up -d 
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} logs -f darkflows 

@@ -28,10 +28,9 @@ interface BlogPostProps {
     createdAt: string;
     formattedDate: string;
   };
-  isPreview?: boolean;
 }
 
-export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
+export default function BlogPost({ post }: BlogPostProps) {
   const router = useRouter();
   const [toc, setToc] = useState<TableOfContentsItem[]>([]);
 
@@ -115,33 +114,6 @@ export default function BlogPost({ post, isPreview = false }: BlogPostProps) {
           </header>
 
           <RichTextRenderer content={post.content} />
-
-          {isPreview && (
-            <div className="mt-8 flex gap-4">
-              <button
-                onClick={() => router.push(`/blog/${post._id}?edit=true`)}
-                className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500"
-              >
-                Edit
-              </button>
-              <button
-                onClick={async () => {
-                  if (confirm('Are you sure you want to delete this post?')) {
-                    const res = await fetch(`/api/posts/${post._id}`, {
-                      method: 'DELETE',
-                    });
-                    if (res.ok) {
-                      router.push('/blog');
-                      router.refresh();
-                    }
-                  }
-                }}
-                className="px-6 py-2 bg-red-600 rounded-md hover:bg-red-500"
-              >
-                Delete
-              </button>
-            </div>
-          )}
         </article>
 
         {/* Table of Contents Sidebar */}

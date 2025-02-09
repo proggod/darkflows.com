@@ -1,10 +1,7 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import BlogPost from '@/app/components/BlogPost';
-import { verifySession } from '@/actions/auth';
-import Link from 'next/link';
-import BlogEditor from '@/app/components/BlogEditor';
 import { formatDate } from '@/lib/format';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';
@@ -56,18 +53,10 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
-  searchParams: Promise<{
-    edit?: string;
-  }>;
 }
 
-export default async function BlogPostPage({ params, searchParams }: Props) {
+export default async function BlogPostPage({ params }: Props) {
   const { id } = await params;
-  const { edit } = await searchParams;
-  const isEditing = edit === 'true';
-  
-  // Only verify session if we're editing
-  const session = isEditing ? await verifySession() : null;
   
   try {
     await initDatabase();
@@ -81,20 +70,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
       notFound();
     }
 
-    // If trying to edit without admin rights, redirect
-    if (isEditing && (!session || session.role !== 'admin')) {
-      redirect('/login');
-    }
-
-    // Serialize for BlogEditor when editing
-    const editorPost = {
-      _id: post._id.toString(),
-      title: post.title,
-      content: String(post.content),
-      category: post.category?._id.toString() || ''
-    };
-
-    // Serialize for BlogPost when viewing
+    // Serialize for BlogPost
     const blogPost = {
       ...post,
       _id: post._id.toString(),
@@ -114,23 +90,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
 
     return (
       <div className="w-full max-w-[90rem] mx-auto">
-        {isEditing ? (
-          <BlogEditor post={editorPost} />
-        ) : (
-          <>
-            <BlogPost post={blogPost} isPreview={session?.role === 'admin'} />
-            {session?.role === 'admin' && (
-              <div className="mt-8 px-4">
-                <Link 
-                  href={`/blog/${id}?edit=true`}
-                  className="text-blue-500 hover:underline"
-                >
-                  Edit Post
-                </Link>
-              </div>
-            )}
-          </>
-        )}
+        <BlogPost post={blogPost} />
       </div>
     );
   } catch (error) {

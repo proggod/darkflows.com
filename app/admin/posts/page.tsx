@@ -54,7 +54,7 @@ export default async function AdminPostsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Link
-                  href={`/blog/${post._id}?edit=true`}
+                  href={`/admin/posts/edit/${post._id}`}
                   className="text-blue-400 hover:text-blue-300"
                 >
                   Edit

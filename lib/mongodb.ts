@@ -31,30 +31,39 @@ async function connectDB() {
     return null;
   }
 
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
-      socketTimeoutMS: 5000,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI!, opts);
-  }
-
   try {
+    if (cached.conn) {
+      return cached.conn;
+    }
+
+    console.log('Connecting to MongoDB:', {
+      timestamp: new Date().toISOString(),
+      uri: process.env.MONGODB_URI?.replace(/:[^:@]+@/, ':***@'),
+      currentState: mongoose.connection.readyState
+    });
+
+    if (!cached.promise) {
+      const opts = {
+        bufferCommands: true,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 10000,
+      };
+
+      cached.promise = mongoose.connect(MONGODB_URI!, opts);
+    }
+
     cached.conn = await cached.promise;
+    return cached.conn;
   } catch (e) {
     cached.promise = null;
-    console.error('MongoDB connection error:', e);
-    return null;
+    console.error('MongoDB connection error:', {
+      error: e,
+      stack: e instanceof Error ? e.stack : undefined,
+      uri: process.env.MONGODB_URI?.replace(/:[^:@]+@/, ':***@')
+    });
+    throw e;
   }
-
-  return cached.conn;
 }
 
 export default connectDB; 

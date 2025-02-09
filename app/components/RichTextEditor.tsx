@@ -38,7 +38,7 @@ lowlight.register('css', css);
 lowlight.register('c', c);
 lowlight.register('cpp', cpp);
 
-const SUPPORTED_LANGUAGES = [
+const _SUPPORTED_LANGUAGES = [
   'typescript',
   'javascript',
   'python',
@@ -53,8 +53,6 @@ const SUPPORTED_LANGUAGES = [
   'html',
   'css'
 ] as const;
-
-type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
 
 interface RichTextEditorProps {
   content: string;
@@ -322,7 +320,8 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   );
 }
 
-function detectLanguage(code: string): SupportedLanguage | null {
+function detectLanguage(code: string): typeof _SUPPORTED_LANGUAGES[number] {
+  // Check if code contains language-specific patterns
   if (code.includes('#include') && code.includes('class ') || code.includes('std::')) return 'cpp';
   if (code.includes('#include') || code.includes('int main(')) return 'c';
   if (code.includes('def ') || code.includes('import ') && code.includes(':')) return 'python';
@@ -335,5 +334,6 @@ function detectLanguage(code: string): SupportedLanguage | null {
   if (code.includes('{') && code.includes(':')) return 'json';
   if (code.includes('.class') || code.includes('#id')) return 'css';
   if (code.includes('#!/') || code.includes('$ ')) return 'bash';
-  return 'typescript'; // default
+  
+  return 'typescript'; // Default language
 }

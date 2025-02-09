@@ -97,7 +97,15 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         openOnClick: false,
       }),
     ],
-    content: isMounted ? content : '',
+    content: isMounted ? (() => {
+      if (!content) {
+        return {
+          type: 'doc',
+          content: [{ type: 'paragraph' }]
+        };
+      }
+      return content;
+    })() : null,
     editorProps: {
       attributes: {
         class: 'prose prose-invert min-h-[200px] max-w-none w-full p-4 focus:outline-none [&_.no-spacing]:m-0 [&_.no-spacing]:p-0',
@@ -149,7 +157,6 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       },
     },
     onUpdate: ({ editor }) => {
-      // Convert to JSON and stringify before saving
       const json = editor.getJSON();
       onChange(JSON.stringify(json));
       
@@ -157,7 +164,22 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       setDebugHtml(editor.getHTML());
       setDebugContent(JSON.stringify(json, null, 2));
     },
+    immediatelyRender: false
   });
+
+  // Update content when it changes externally
+  useEffect(() => {
+    if (editor && content) {
+      try {
+        const parsedContent = typeof content === 'string' ? JSON.parse(content) : content;
+        if (JSON.stringify(editor.getJSON()) !== JSON.stringify(parsedContent)) {
+          editor.commands.setContent(parsedContent);
+        }
+      } catch (e) {
+        console.error('Failed to parse content:', e);
+      }
+    }
+  }, [editor, content]);
 
   const addImage = useCallback(async () => {
     const input = document.createElement('input');

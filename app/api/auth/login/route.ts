@@ -21,6 +21,12 @@ export async function POST(
       );
     }
 
+    console.log('Login user:', {
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name
+    });
+
     if (!user.approved) {
       return NextResponse.json(
         { error: 'Account pending approval' },
@@ -31,6 +37,7 @@ export async function POST(
     const token = await new SignJWT({
       id: user._id.toString(),
       email: user.email,
+      name: user.name,
       role: user.role,
       approved: user.approved
     })

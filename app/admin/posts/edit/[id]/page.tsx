@@ -26,6 +26,7 @@ interface PostDocument extends FlattenMaps<Document> {
   createdAt: Date;
   updatedAt: Date;
   __v: number;
+  description: string;
 }
 
 interface Props {
@@ -58,6 +59,7 @@ export default async function EditPostPage({ params }: Props) {
     const editorPost = {
       _id: post._id.toString(),
       title: post.title,
+      description: post.description,
       content: String(post.content),
       category: post.category?._id.toString() || ''
     };

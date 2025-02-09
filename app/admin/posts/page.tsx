@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminPostsPage() {
   const session = await verifySession();
+  console.log('Admin session:', session); // Debug session
   
   if (session.role !== 'admin') {
     redirect('/login');
@@ -18,10 +19,16 @@ export default async function AdminPostsPage() {
   await initDatabase();
 
   const posts = await Post.find()
-    .populate('author', 'name email')
+    .populate({
+      path: 'author',
+      select: 'name email',
+      model: 'User'
+    })
     .populate('category', 'name')
     .sort({ createdAt: -1 })
     .lean();
+
+  console.log('Admin posts with authors:', posts);
 
   return (
     <div className="max-w-7xl mx-auto px-4">

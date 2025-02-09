@@ -8,15 +8,7 @@ import connectDB from '@/lib/mongodb'
 import { cache } from 'react'
 
 // Near the top of the file
-console.log('Auth environment check:', {
-  nodeEnv: process.env.NODE_ENV,
-  jwtSecret: {
-    exists: !!process.env.JWT_SECRET,
-    length: process.env.JWT_SECRET?.length,
-    firstChar: process.env.JWT_SECRET?.[0],
-    lastChar: process.env.JWT_SECRET?.[process.env.JWT_SECRET.length - 1]
-  }
-});
+
 
 // Helper function to set session cookie
 async function setSessionCookie(token: string) {
@@ -92,7 +84,9 @@ export const getSession = cache(async () => {
 
 // Add detailed logging for authentication flow
 function logAuthAttempt(stage: string, data: Record<string, unknown>) {
-  console.log(`🔐 Auth [${stage}]:`, JSON.stringify(data, null, 2));
+  void stage;
+  void data;
+  //console.log(`🔐 Auth [${stage}]:`, JSON.stringify(data, null, 2));
 }
 
 export const verifySession = cache(async () => {
@@ -148,10 +142,6 @@ export const verifySession = cache(async () => {
 })
 
 // Add this near your login/verification logic
-console.log('JWT_SECRET status:', {
-  exists: !!process.env.JWT_SECRET,
-  length: process.env.JWT_SECRET?.length
-});
 
 // Define our state type
 interface LoginState {

@@ -15,6 +15,7 @@ interface BlogEditorProps {
   post?: {
     _id: string;
     title: string;
+    description: string;
     content: string;
     category: string;
   };
@@ -23,6 +24,7 @@ interface BlogEditorProps {
 export default function BlogEditor({ post }: BlogEditorProps) {
   const router = useRouter();
   const [title, setTitle] = useState(post?.title || '');
+  const [description, setDescription] = useState(post?.description || '');
   const [content, setContent] = useState(post?.content || '');
   const [category, setCategory] = useState(post?.category || '');
   const [categories, setCategories] = useState<Category[]>([]);
@@ -60,6 +62,15 @@ export default function BlogEditor({ post }: BlogEditorProps) {
     setError('');
 
     try {
+      const payload = {
+        title,
+        description,
+        content,
+        category,
+        readingTime: Math.ceil(content.split(' ').length / 200)
+      };
+      console.log('Sending payload:', payload);
+
       const res = await fetch(
         post ? `/api/posts/${post._id}` : '/api/posts',
         {
@@ -67,24 +78,30 @@ export default function BlogEditor({ post }: BlogEditorProps) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            title,
-            content,
-            category
-          }),
+          credentials: 'include',
+          body: JSON.stringify(payload),
         }
       );
 
+      console.log('Response status:', res.status);
+      const responseText = await res.text();
+      console.log('Raw response:', responseText);
+
       if (!res.ok) {
-        throw new Error('Failed to save post');
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch {
+          errorData = { message: 'Failed to parse error response' };
+        }
+        throw new Error(errorData.message || 'Failed to save post');
       }
 
-      // Redirect to admin posts page instead of blog
       router.push('/admin/posts');
       router.refresh();
     } catch (err) {
-      console.error('Save error:', err);
-      setError('Failed to save post');
+      console.error('Save error details:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save post');
     } finally {
       setLoading(false);
     }
@@ -106,6 +123,19 @@ export default function BlogEditor({ post }: BlogEditorProps) {
           onChange={(e) => setTitle(e.target.value)}
           required
           className="w-full px-4 py-2 bg-gray-800 rounded-md border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">Description</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          rows={2}
+          maxLength={400}
+          placeholder="Brief description of the post (max 400 characters)"
+          className="w-full px-4 py-2 bg-gray-800 rounded-md border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
         />
       </div>
 

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 export interface IPost {
   title: string;
   content: string;
+  description: string;
   author: mongoose.Types.ObjectId;
   category: mongoose.Types.ObjectId;
   coverImage?: string;
@@ -16,6 +17,11 @@ export const PostSchema = new mongoose.Schema<IPost>({
     type: String,
     required: [true, 'Please provide a title'],
     maxlength: [200, 'Title cannot be more than 200 characters']
+  },
+  description: {
+    type: String,
+    required: [true, 'Please provide a description'],
+    maxlength: [400, 'Description cannot be more than 400 characters']
   },
   content: {
     type: String,
@@ -43,4 +49,6 @@ export const PostSchema = new mongoose.Schema<IPost>({
   timestamps: true
 });
 
-export default mongoose.models.Post || mongoose.model('Post', PostSchema); 
+// Make sure model is registered only once
+const Post = mongoose.models.Post || mongoose.model('Post', PostSchema);
+export default Post; 

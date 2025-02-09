@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import hljs from 'highlight.js';
@@ -31,7 +30,6 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ post }: BlogPostProps) {
-  const router = useRouter();
   const [toc, setToc] = useState<TableOfContentsItem[]>([]);
 
   useEffect(() => {

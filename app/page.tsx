@@ -7,6 +7,7 @@ import FAQ from '@/app/components/FAQ';
 import siteContent from '@/data/site-content.json';
 import { SiteContent } from '@/types';
 // import VideoTutorials from './components/VideoTutorials'
+import FeaturedPost from '@/app/components/FeaturedPost';
 
 export default function Home() {
   const content = siteContent as SiteContent;
@@ -14,6 +15,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black">
       <TopNavBar />
+      {/* <FeaturedPost /> */}
       <ScrollReveal data={content.hero} />
       <div className="space-y-2">
         {content.dataConnectSections.map((section, index) => (
@@ -29,6 +31,7 @@ export default function Home() {
         <FeatureCarousel />
       </div>
       {/* <VideoTutorials /> */}
+     
       <FAQ data={content.faq} />
       {/* <Footer data={content.footer} /> */}
     </main>

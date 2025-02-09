@@ -3,6 +3,8 @@ import { verifySession } from '@/lib/session';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { initDatabase } from '@/lib/db/init';
+import { verifySession as authVerifySession } from '@/actions/auth';
+import mongoose from 'mongoose';
 
 // Get single post
 export async function GET(
@@ -15,6 +17,7 @@ export async function GET(
     await connectDB();
     
     const post = await Post.findById(id)
+      .select('title content description category author readingTime')
       .populate('author', 'name email')
       .populate('category', 'name slug')
       .lean();
@@ -35,36 +38,59 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-
   try {
     const session = await verifySession();
+    console.log('Session:', session);
+    
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
 
+    await initDatabase();
     await connectDB();
-    const post = await Post.findById(id);
 
-    if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
-    }
+    const { id } = await context.params;
+    const data = await request.json();
+    console.log('Received data:', data);
 
-    if (post.author.toString() !== session.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-
-    const body = await request.json();
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
+    // First try direct MongoDB update
+    const result = await Post.collection.updateOne(
+      { _id: new mongoose.Types.ObjectId(id) },
       {
-        ...body,
-        updatedAt: new Date(),
-        readingTime: Math.ceil(body.content.split(' ').length / 200)
-      },
-      { new: true }
-    ).populate('author', 'name email');
+        $set: {
+          title: data.title,
+          content: data.content,
+          description: data.description,
+          category: new mongoose.Types.ObjectId(data.category),
+          readingTime: data.readingTime,
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    console.log('Direct update result:', result);
 
-    return NextResponse.json(updatedPost);
+    // Then fetch the updated document
+    const updatedPost = await Post.findById(id)
+      .populate('author', 'name email')
+      .populate('category', 'name slug')
+      .lean();
+
+    if (!updatedPost) {
+      throw new Error('Failed to fetch updated post');
+    }
+
+    console.log('Final post:', updatedPost);
+
+    return NextResponse.json({
+      ...updatedPost,
+      description: data.description
+    });
   } catch (error) {
-    console.error('Failed to update post:', error);
+    console.error('Error updating post:', error);
     return NextResponse.json(
       { error: 'Failed to update post' },
       { status: 500 }

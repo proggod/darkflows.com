@@ -7,7 +7,7 @@ import FAQ from '@/app/components/FAQ';
 import siteContent from '@/data/site-content.json';
 import { SiteContent } from '@/types';
 // import VideoTutorials from './components/VideoTutorials'
-import FeaturedPost from '@/app/components/FeaturedPost';
+//import FeaturedPost from '@/app/components/FeaturedPost';
 
 export default function Home() {
   const content = siteContent as SiteContent;

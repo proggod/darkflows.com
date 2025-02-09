@@ -10,13 +10,13 @@ import { usePathname } from 'next/navigation';
 // Main NavBar component
 export default function TopNavBar() {
   const pathname = usePathname();
-  const isInBlog = pathname?.startsWith('/blog');
+  const isInBlogPost = pathname?.startsWith('/blog/') && pathname !== '/blog';
 
   return (
     <nav className="fixed top-0 w-full bg-[#111111]/95 backdrop-blur supports-[backdrop-filter]:bg-[#111111]/60 z-50">
       <div className="relative flex h-12 items-center px-4">
         {/* Left - Conditional Logo/Home Button */}
-        {isInBlog ? (
+        {isInBlogPost ? (
           <Link 
             href="/blog"
             className="flex items-center gap-2 text-gray-200 hover:text-white transition-colors"

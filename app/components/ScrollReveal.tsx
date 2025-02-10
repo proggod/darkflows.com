@@ -33,7 +33,7 @@ const ScrollReveal = ({ data }: Props) => {
   }, []);
 
   return (
-    <div className="relative min-h-[300vh] bg-black">
+    <div className="relative min-h-[300vh] bg-transparent">
       {/* First section - Initial view */}
       <div className="sticky top-0 h-screen flex items-start pt-96 justify-center overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 w-full relative">

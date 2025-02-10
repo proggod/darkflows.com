@@ -29,7 +29,7 @@ const DataConnectSection = ({ data, sectionId, imageOnRight = true }: Props) => 
   }, [sectionId]);
 
   return (
-    <div id={sectionId} className="py-12 bg-black">
+    <div id={sectionId} className="py-12 bg-transparent">
       <div className="max-w-7xl mx-auto px-6 md:px-4 flex flex-col lg:flex-row items-center">
         {/* Content section */}
         <div className={`w-full lg:w-1/2 space-y-8 px-4 lg:px-0 ${

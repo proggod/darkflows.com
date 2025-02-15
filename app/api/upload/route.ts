@@ -4,6 +4,12 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { NextRequest } from 'next/server';
 
+// Define upload paths based on environment
+const UPLOAD_DIR = process.env.NODE_ENV === 'development' 
+  ? '/app/public/uploads'  // Changed from './uploads' to match Docker mount
+  : '/uploads';
+
+
 export const config = {
   api: {
     bodyParser: {
@@ -37,18 +43,17 @@ export async function POST(request: NextRequest) {
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
     
     // Ensure uploads directory exists
-    const uploadDir = path.join(process.cwd(), 'public/uploads');
     try {
-      await mkdir(uploadDir, { recursive: true });
+      await mkdir(UPLOAD_DIR, { recursive: true });
     } catch (error) {
       console.warn('Upload directory creation warning:', error);
-      // Directory might already exist, continue
     }
 
     // Write file to uploads directory
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadDir, filename), buffer);
+    await writeFile(path.join(UPLOAD_DIR, filename), buffer);
 
+    // Return URL path that works in both environments
     return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (err) {
     console.error('Upload error:', err);

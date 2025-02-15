@@ -92,12 +92,12 @@ const ScrollReveal = ({ data }: Props) => {
           </div>
 
           {/* Laptop image container */}
-          <div className="absolute inset-0 flex items-center justify-center bg-transparent">
+          <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className="relative w-full max-w-[900px] transition-all duration-500 bg-transparent"
+              className="relative w-full max-w-[900px] transition-all duration-1000"
               style={{
                 transform: `scale(${Math.min(1 + scrollPosition / 50, 1.2)})`,
-                opacity: Math.min(scrollPosition / 100, 1)
+                opacity: Math.max(0, Math.min((scrollPosition - 10) / 50, 1))
               }}
             >
               <Image
@@ -107,7 +107,7 @@ const ScrollReveal = ({ data }: Props) => {
                 height={600}
                 priority={true}
                 loading="eager"
-                className="w-full h-auto object-contain transition-transform duration-500 bg-transparent"
+                className="w-full h-auto object-contain transition-transform duration-1000"
                 style={{
                   transform: `translateY(${scrollPosition > 50 ? 0 : 100}px)`,
                 }}

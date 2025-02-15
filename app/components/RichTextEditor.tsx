@@ -61,7 +61,7 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [_uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [debugContent, setDebugContent] = useState('');
   const [debugHtml, setDebugHtml] = useState('');
   
@@ -83,6 +83,17 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       Image.configure({
         HTMLAttributes: {
           class: 'max-w-full rounded-lg',
+          onError: (e: Event) => {
+            const img = e.target as HTMLImageElement;
+            console.error('Image failed to load:', {
+              src: img.src,
+              currentPath: window.location.pathname,
+              isEditing: editor?.isEditable,
+              time: new Date().toISOString()
+            });
+            img.style.border = '2px solid red';
+            img.style.padding = '1rem';
+          }
         },
       }),
       CodeBlockLowlight.configure({
@@ -295,10 +306,16 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
           <button
             type="button"
             onClick={addImage}
-            className="p-2 rounded hover:bg-gray-700"
+            className="p-2 rounded hover:bg-gray-700 relative"
             title="Add Image"
+            disabled={uploading}
           >
-            <ImageIcon size={16} />
+            <ImageIcon size={16} className={uploading ? 'opacity-50' : ''} />
+            {uploading && (
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 px-2 py-1 rounded text-xs whitespace-nowrap">
+                Uploading...
+              </div>
+            )}
           </button>
           <button
             type="button"

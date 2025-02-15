@@ -1,4 +1,3 @@
-
 services:
   darkflows:
     container_name: darkflows
@@ -13,7 +12,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - uploads_data:/var/www/darkflows.com/public/uploads
+      - /var/www/darkflows.com/public/uploads:/uploads
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://0.0.0.0:3050/api/debug"]
       interval: 30s
@@ -33,6 +32,7 @@ services:
       - RESET_PASSWORD=${RESET_PASSWORD}
       - NEXT_PUBLIC_APP_URL=https://darkflows.com  # Replace with your actual domain
 
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -42,6 +42,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=darkflows
     volumes:
       - /var/www/darkflows.com/data/db:/data/db
+
     networks:
       - web
     healthcheck:

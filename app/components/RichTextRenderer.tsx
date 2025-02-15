@@ -23,10 +23,16 @@ interface Node {
     }>;
     attrs?: {
       language?: string;
+      src?: string;
+      alt?: string;
+      title?: string;
     };
   }>;
   attrs?: {
     language?: string;
+    src?: string;
+    alt?: string;
+    title?: string;
   };
 }
 
@@ -103,6 +109,9 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
       
       jsonContent.content.forEach((node: Node) => {
         switch (node.type) {
+          case 'image':
+            processedHtml += `<img src="${node.attrs?.src}" alt="${node.attrs?.alt || ''}" class="max-w-full rounded-lg" />`;
+            break;
           case 'codeBlock':
             const code = node.content?.[0]?.text || '';
             const highlighted = hljs.highlight(code, {

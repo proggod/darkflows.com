@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   darkflows:
     container_name: darkflows-dev
@@ -17,7 +15,7 @@ services:
       - .:/app
       - /app/node_modules
       - /app/.next
-      - uploads_data_dev:/app/public/uploads
+      - ./public/uploads:/app/public/uploads
     environment:
       - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
       - NODE_ENV=development
@@ -25,6 +23,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-your-development-secret}
       - RESET_PASSWORD=${RESET_PASSWORD:-}
       - NEXT_PUBLIC_APP_URL=http://localhost:3050
+      - UPLOADS_PATH=/app/public/uploads
     command: npm run dev
 
   mongodb:
@@ -46,4 +45,9 @@ services:
 
 volumes:
   mongodb_data_dev:
-  uploads_data_dev: 
+  uploads_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/public/uploads
+      o: bind 

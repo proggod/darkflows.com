@@ -2,11 +2,16 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Install dependencies only when package.json changes
 COPY package*.json ./
 RUN npm install
 
-COPY . .
+# Add development tools
+RUN apk add --no-cache curl python3 make g++
 
-EXPOSE 3000
+# Set development environment
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
 
+# The rest of the source code will be mounted as a volume
 CMD ["npm", "run", "dev"] 

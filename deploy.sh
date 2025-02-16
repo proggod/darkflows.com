@@ -25,43 +25,41 @@ done
 
 # Set the compose file based on environment
 COMPOSE_FILE="docker-compose.${ENVIRONMENT}.yml"
-ENV_FILE=".env.production"  # Always use .env.production for prod
+ENV_FILE=".env.${ENVIRONMENT}"
 
 echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
 
 # Check for environment file
 if [ ! -f "$ENV_FILE" ]; then
-    echo "⚠️  ${ENV_FILE} not found. Please create .env.production manually."
-    exit 1
+    echo "⚠️  ${ENV_FILE} not found. Creating from example..."
+    cp "sample.env.${ENVIRONMENT}" "$ENV_FILE"
 fi
 
 echo "🛑 Stopping existing containers..."
 $DOCKER_COMPOSE -f ${COMPOSE_FILE} down
 
 echo "🧹 Cleaning up..."
-docker system prune -f
+# Modified to keep build cache
+docker system prune -f --filter "until=24h"
 
 # Create Docker volumes if they don't exist
 echo "📦 Setting up volumes..."
 if [ "$ENVIRONMENT" = "prod" ]; then
-    # Create directories
+    # Create directories with proper permissions
     sudo mkdir -p /var/www/darkflows.com/data/db
     sudo mkdir -p /var/www/darkflows.com/public/uploads
     
-    # Set proper ownership
     sudo chown -R 999:999 /var/www/darkflows.com/data/db
     sudo chown -R 998:www-data /var/www/darkflows.com/public/uploads
     
-    # Set proper permissions
     sudo chmod -R 700 /var/www/darkflows.com/data/db
     sudo chmod -R 775 /var/www/darkflows.com/public/uploads
 else
     docker volume create mongodb_data_dev || true
-    docker volume create uploads_data_dev || true
+    docker volume create node_modules || true
+    docker volume create next-cache || true
 fi
 
-
-export RESET_PASSWORD=$(grep RESET_PASSWORD .env.production | cut -d '=' -f2 | tr -d '[:space:]')
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "⬇️ Pulling latest images..."
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} pull
@@ -73,12 +71,8 @@ fi
 echo "🚀 Starting containers..."
 $DOCKER_COMPOSE -f ${COMPOSE_FILE} up -d
 
-echo "⏳ Waiting for MongoDB to be ready..."
-if [ "$ENVIRONMENT" = "prod" ]; then
-    $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
-else
-    $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb sh -c 'until mongosh --eval "db.adminCommand(\"ping\")" > /dev/null 2>&1; do sleep 1; done'
-fi
+echo "⏳ Waiting for services to be ready..."
+sleep 10
 
 echo "✅ Deployment complete!"
 

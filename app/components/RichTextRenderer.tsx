@@ -60,9 +60,10 @@ interface JsonContent {
 
 interface RichTextRendererProps {
   content: string;
+  onImageClick?: (src: string) => void;
 }
 
-export default function RichTextRenderer({ content }: RichTextRendererProps) {
+export default function RichTextRenderer({ content, onImageClick }: RichTextRendererProps) {
   const [html, setHtml] = useState('');
 
   // Initialize highlight.js
@@ -130,7 +131,9 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
       jsonContent.content.forEach((node: Node) => {
         switch (node.type) {
           case 'image':
-            processedHtml += `<img src="${node.attrs?.src}" alt="${node.attrs?.alt || ''}" class="max-w-full rounded-lg" />`;
+            processedHtml += `<img src="${node.attrs?.src}" alt="${node.attrs?.alt || ''}" 
+              class="max-w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-200" 
+              onclick="window.handleImageClick && window.handleImageClick('${node.attrs?.src}')" />`;
             break;
           case 'codeBlock':
             const code = node.content?.[0]?.text || '';
@@ -224,6 +227,16 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
       hljs.highlightElement(block as HTMLElement);
     });
   }, [content]);
+
+  // Add this useEffect
+  useEffect(() => {
+    if (onImageClick) {
+      (window as any).handleImageClick = onImageClick;
+    }
+    return () => {
+      delete (window as any).handleImageClick;
+    };
+  }, [onImageClick]);
 
   return (
     <div 

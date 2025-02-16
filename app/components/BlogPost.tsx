@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 import RichTextRenderer from './RichTextRenderer';
 import { generateHeadingId } from '../utils/headingUtils';
+import { X } from 'lucide-react';
 
 interface TableOfContentsItem {
   id: string;
@@ -33,6 +34,7 @@ interface BlogPostProps {
 
 export default function BlogPost({ post }: BlogPostProps) {
   const [toc, setToc] = useState<TableOfContentsItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (post?.content) {
@@ -101,18 +103,31 @@ export default function BlogPost({ post }: BlogPostProps) {
     }, 100);
   };
 
+  const handleImageClick = useCallback((src: string) => {
+    setSelectedImage(src);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setSelectedImage(null);
+  }, []);
+
   return (
     <div className="w-full max-w-none mx-auto px-4 py-8">
       <div className="lg:grid lg:grid-cols-4 lg:gap-8">
         <article className="col-span-3 min-w-0 w-full">
           {post.coverImage && (
             <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">
-              <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                className="object-cover"
-              />
+              <button 
+                onClick={() => handleImageClick(post.coverImage!)}
+                className="w-full h-full"
+              >
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-200"
+                />
+              </button>
             </div>
           )}
 
@@ -138,7 +153,10 @@ export default function BlogPost({ post }: BlogPostProps) {
             </div>
           </header>
 
-          <RichTextRenderer content={post.content} />
+          <RichTextRenderer 
+            content={post.content} 
+            onImageClick={handleImageClick} 
+          />
         </article>
 
         {/* Table of Contents Sidebar */}
@@ -161,6 +179,30 @@ export default function BlogPost({ post }: BlogPostProps) {
           </div>
         </aside>
       </div>
+
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={closeModal}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <button
+              onClick={closeModal}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <X size={32} />
+            </button>
+            <Image
+              src={selectedImage}
+              alt="Full size image"
+              width={1920}
+              height={1080}
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

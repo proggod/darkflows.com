@@ -4,14 +4,11 @@
 set -e
 
 echo "🧹 Cleaning up..."
-rm -rf .next
-rm -rf node_modules
-
-echo "📦 Installing dependencies..."
-# Remove package-lock.json if it exists
-rm -f package-lock.json
-# Run npm install instead of npm ci to generate a new package-lock.json
-npm install
+# Remove this section as it's not needed with Docker caching
+# rm -rf .next
+# rm -rf node_modules
+# rm -f package-lock.json
+# npm install
 
 echo "🔧 Setting up builder..."
 if ! docker buildx create --name darkflows-builder --use; then
@@ -33,8 +30,8 @@ fi
 echo "🏗️ Building multi-platform image..."
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  --no-cache \
-  --pull \
+  --cache-from type=registry,ref=proggod/darkflows-web:buildcache \
+  --cache-to type=registry,ref=proggod/darkflows-web:buildcache,mode=max \
   -t proggod/darkflows-web:latest \
   --push \
   .

@@ -130,43 +130,22 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       attributes: {
         class: 'prose prose-invert min-h-[200px] max-w-none w-full p-4 focus:outline-none [&_.no-spacing]:m-0 [&_.no-spacing]:p-0',
       },
-      handlePaste: (view, event) => {
-        const text = event.clipboardData?.getData('text/plain');
-        if (text) {
-          // If we're already in a code block, just insert the text
-          if (view.state.selection.$head.parent.type.name === 'codeBlock') {
-            view.dispatch(view.state.tr.insertText(text.replace(/^"(.*)"$/, '$1')));
-            return true;
-          }
-
-          const cleanedText = text.trim().replace(/^"(.*)"$/, '$1');
-          const isUrlOrCommand = /^(http|https|ftp):\/\//.test(cleanedText) || 
-                                cleanedText.includes(' ; ') ||
-                                cleanedText.startsWith('su -') ||
-                                cleanedText.startsWith('apt ') ||
-                                cleanedText.startsWith('curl ');
-          
-          if (isUrlOrCommand) {
-            // Create a blockquote with a paragraph and text
-            const blockquote = view.state.schema.nodes.blockquote.create(
-              null,
-              [view.state.schema.nodes.paragraph.create(
-                null,
-                [view.state.schema.text(cleanedText)]
-              )]
-            );
-            
-            const tr = view.state.tr;
-            tr.replaceSelectionWith(blockquote);
-            view.dispatch(tr);
-            return true;
-          }
-        }
-        return false;
+      handlePaste: (view, event, slice) => {
+        console.log('Paste event:', {
+          slice,
+          content: slice.content.toJSON(),
+          text: event.clipboardData?.getData('text/plain')
+        });
+        return false; // Let TipTap handle it normally for now
       },
     },
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
+      console.log('Editor update:', {
+        json,
+        html: editor.getHTML(),
+        text: editor.getText()
+      });
       onChange(JSON.stringify(json));
       
       // For debugging only
@@ -204,20 +183,27 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         const formData = new FormData();
         formData.append('file', file);
 
+        console.log('Uploading file:', {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        });
+
         const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
 
         if (!response.ok) {
-          throw new Error('Upload failed');
+          const error = await response.text();
+          throw new Error(`Upload failed: ${error}`);
         }
 
         const { url } = await response.json();
         editor?.chain().focus().setImage({ src: url }).run();
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Failed to upload image');
+        alert(`Failed to upload image: ${error.message}`);
       } finally {
         setUploading(false);
       }

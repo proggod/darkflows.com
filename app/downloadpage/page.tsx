@@ -9,8 +9,8 @@ export default function DownloadPage() {
   const [copySuccess, setCopySuccess] = useState('');
 
   const instructions = {
-    install: 'su - root ; apt install curl ; curl -sSL https://darkflows.com/downloads/install.sh | bash',
-    update: 'su - root ; apt install curl ; curl -sSL https://darkflows.com/downloads/update.sh | bash'
+    install: 'su - root -c "apt install -y curl && curl -sSL https://darkflows.com/downloads/install.sh | bash"',
+    update: 'su - root -c "apt install -y curl && curl -sSL https://darkflows.com/downloads/update.sh | bash"'
   };
 
   const descriptions = {

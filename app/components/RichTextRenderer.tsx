@@ -121,10 +121,13 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
   // Parse and highlight content
   useEffect(() => {
     try {
+      console.log('Parsing content:', content);
       const jsonContent = JSON.parse(content) as JsonContent;
+      console.log('Parsed JSON:', jsonContent);
       let processedHtml = '';
       
-      jsonContent.content.forEach((node: Node) => {
+      jsonContent.content.forEach((node: Node, index: number) => {
+        console.log(`Processing node ${index}:`, node);
         switch (node.type) {
           case 'image':
             processedHtml += `<img src="${node.attrs?.src}" alt="${node.attrs?.alt || ''}" class="max-w-full rounded-lg" />`;
@@ -139,12 +142,34 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
             );
             break;
           case 'blockquote':
-            const rawText = node.content?.map(innerNode => 
-              innerNode.content?.[0]?.text || ''
-            ).filter(Boolean).join('\n');
+            console.log('Blockquote node:', node);
+            const rawText = node.content?.map(innerNode => {
+              console.log('Processing innerNode:', innerNode);
+              if (!innerNode.content) {
+                console.log('No content in innerNode');
+                return '';
+              }
+              return innerNode.content.map(contentNode => {
+                console.log('Processing contentNode:', contentNode);
+                if (contentNode.marks?.some(mark => mark.type === 'link')) {
+                  const link = contentNode.marks.find(mark => mark.type === 'link');
+                  console.log('Found link:', link);
+                  return `<a href="${link?.attrs?.href || ''}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300">${contentNode.text}</a>`;
+                }
+                return contentNode.text;
+              }).join('');
+            }).filter(Boolean).join('\n') || '';
+            
+            console.log('Final rawText:', rawText);
+            
+            // Try escaping semicolons and other special characters
+            const escapedText = rawText.replace(/;/g, '&#59;')
+                                      .replace(/\|/g, '&#124;');
+            
+            console.log('Escaped text:', escapedText);
             
             processedHtml += wrapWithCopyButton(
-              `<pre class="hljs"><code class="language-shell">${rawText}</code></pre>`
+              `<pre class="hljs"><code class="language-shell">${escapedText}</code></pre>`
             );
             break;
           case 'paragraph':
@@ -159,8 +184,11 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
         }
       });
 
+      console.log('Final HTML:', processedHtml);
       setHtml(processedHtml);
     } catch (error) {
+      console.error('Error parsing content:', error);
+      console.error('Content that caused error:', content);
       setHtml(content);
     }
   }, [content]);

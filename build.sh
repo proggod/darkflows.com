@@ -3,6 +3,14 @@
 # Exit on any error
 set -e
 
+# Login to Docker Hub if credentials are provided
+if [ ! -z "$DOCKER_USERNAME" ] && [ ! -z "$DOCKER_PASSWORD" ]; then
+  echo "🔑 Logging into Docker Hub..."
+  echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+else
+  echo "⚠️  No Docker credentials found in environment. Using cached credentials..."
+fi
+
 echo "🧹 Cleaning up..."
 # Remove this section as it's not needed with Docker caching
 # rm -rf .next

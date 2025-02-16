@@ -1,19 +1,6 @@
 stages:
   - build
-  - deploy
-
-before_script:
-  - |
-    cat > .env.production << EOF
-    NODE_ENV=production
-    PORT=3050
-    HOSTNAME=0.0.0.0
-    MONGODB_URI=mongodb://admin:${DB_PASSWORD}@mongodb:27017/darkflows?authSource=admin
-    NEXT_TELEMETRY_DISABLED=1
-    JWT_SECRET=${JWT_SECRET}
-    RESET_PASSWORD=${RESET_PASSWORD}
-    NEXT_PUBLIC_APP_URL=https://darkflows.com
-    EOF
+  - notify
 
 build:
   stage: build
@@ -23,10 +10,9 @@ build:
   only:
     - main
 
-deploy:
-  stage: deploy
+notify:
+  stage: notify
   script:
-    - chmod +x ./deploy.sh
-    - ./deploy.sh --prod
+    - 'curl -X POST "https://darkflows.com/deploy?token=${DEPLOY_TOKEN}"'
   only:
     - main 

@@ -1,7 +1,14 @@
-image: docker:latest
+image: docker:24.0.7
 
 services:
-  - docker:dind
+  - name: docker:24.0.7-dind
+    alias: docker
+    command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
+
+variables:
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: "overlay2"
 
 stages:
   - build
@@ -14,6 +21,7 @@ build:
   script:
     - pwd
     - ls -la
+    - chmod +x build.sh  # Ensure the script is executable
     - bash ./build.sh
   only:
     - main
@@ -23,4 +31,4 @@ notify:
   script:
     - 'curl -X POST "https://darkflows.com/deploy?token=${DEPLOY_TOKEN}"'
   only:
-    - main 
+    - main

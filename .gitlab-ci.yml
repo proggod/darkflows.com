@@ -22,6 +22,7 @@ build:
     - apk add --no-cache drill
     - echo "Testing DNS for 'dind':"
     - drill dind
+    - pwd
     - docker version
     - docker info
     - docker ps

@@ -5,6 +5,8 @@ stages:
 build:
   stage: build
   script:
+    - pwd
+    - ls -la
     - chmod +x ./build.sh
     - ./build.sh
   only:

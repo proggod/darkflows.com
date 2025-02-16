@@ -21,6 +21,8 @@ import html from 'highlight.js/lib/languages/xml';
 import css from 'highlight.js/lib/languages/css';
 import c from 'highlight.js/lib/languages/c';
 import cpp from 'highlight.js/lib/languages/cpp';
+import shell from 'highlight.js/lib/languages/shell';
+import plaintext from 'highlight.js/lib/languages/plaintext';
 import 'highlight.js/styles/github-dark.css';
 
 const lowlight = createLowlight(common);
@@ -37,6 +39,8 @@ lowlight.register('html', html);
 lowlight.register('css', css);
 lowlight.register('c', c);
 lowlight.register('cpp', cpp);
+lowlight.register('shell', shell);
+lowlight.register('plaintext', plaintext);
 
 const _SUPPORTED_LANGUAGES = [
   'typescript',
@@ -51,7 +55,9 @@ const _SUPPORTED_LANGUAGES = [
   'bash',
   'json',
   'html',
-  'css'
+  'css',
+  'plaintext',
+  'shell'
 ] as const;
 
 interface RichTextEditorProps {
@@ -106,6 +112,9 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       }),
       Link.configure({
         openOnClick: false,
+        transformer: (url: string) => {
+          return url.replace(/^"(.*)"$/, '$1');
+        }
       }),
     ],
     content: isMounted ? (() => {
@@ -126,40 +135,29 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         if (text) {
           // If we're already in a code block, just insert the text
           if (view.state.selection.$head.parent.type.name === 'codeBlock') {
-            view.dispatch(view.state.tr.insertText(text));
+            view.dispatch(view.state.tr.insertText(text.replace(/^"(.*)"$/, '$1')));
             return true;
           }
 
-          const cleanedText = text.trim();
-          const looksLikeCode = cleanedText.includes('\n') || /[{}()<>]/.test(cleanedText);
+          const cleanedText = text.trim().replace(/^"(.*)"$/, '$1');
+          const isUrlOrCommand = /^(http|https|ftp):\/\//.test(cleanedText) || 
+                                cleanedText.includes(' ; ') ||
+                                cleanedText.startsWith('su -') ||
+                                cleanedText.startsWith('apt ') ||
+                                cleanedText.startsWith('curl ');
           
-          if (looksLikeCode) {
-            const tr = view.state.tr;
-            
-            // Find the blockquote node if it exists
-            const $pos = view.state.selection.$head;
-            const blockquote = $pos.node(-1)?.type.name === 'blockquote' 
-              ? $pos.node(-1) 
-              : null;
-            
-            // Create a new code block
-            const codeBlock = view.state.schema.nodes.codeBlock.create(
-              { 
-                language: detectLanguage(cleanedText) || 'typescript' 
-              },
-              [view.state.schema.text(cleanedText)]
+          if (isUrlOrCommand) {
+            // Create a blockquote with a paragraph and text
+            const blockquote = view.state.schema.nodes.blockquote.create(
+              null,
+              [view.state.schema.nodes.paragraph.create(
+                null,
+                [view.state.schema.text(cleanedText)]
+              )]
             );
-
-            if (blockquote) {
-              // If we're in a blockquote, replace the entire blockquote
-              const blockquotePos = $pos.before(-1);
-              tr.replaceWith(blockquotePos, blockquotePos + blockquote.nodeSize, codeBlock);
-            } else {
-              // Otherwise insert at current position
-              const pos = view.state.selection.$head.pos;
-              tr.replaceWith(pos, pos, codeBlock);
-            }
-
+            
+            const tr = view.state.tr;
+            tr.replaceSelectionWith(blockquote);
             view.dispatch(tr);
             return true;
           }
@@ -360,7 +358,18 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 }
 
 function detectLanguage(code: string): typeof _SUPPORTED_LANGUAGES[number] {
-  // Check if code contains language-specific patterns
+  // Trim the code to remove whitespace
+  const trimmedCode = code.trim();
+  
+  // Check for URLs, file paths, or simple commands
+  if (trimmedCode.startsWith('http') || 
+      trimmedCode.startsWith('/') || 
+      trimmedCode.startsWith('@') ||
+      !trimmedCode.includes('\n')) {
+    return 'shell';
+  }
+  
+  // Your existing language detection logic
   if (code.includes('#include') && code.includes('class ') || code.includes('std::')) return 'cpp';
   if (code.includes('#include') || code.includes('int main(')) return 'c';
   if (code.includes('def ') || code.includes('import ') && code.includes(':')) return 'python';
@@ -374,5 +383,7 @@ function detectLanguage(code: string): typeof _SUPPORTED_LANGUAGES[number] {
   if (code.includes('.class') || code.includes('#id')) return 'css';
   if (code.includes('#!/') || code.includes('$ ')) return 'bash';
   
-  return 'typescript'; // Default language
+  // If no specific language is detected, use shell for single-line commands
+  // or plaintext for multi-line text
+  return code.includes('\n') ? 'plaintext' : 'shell';
 }

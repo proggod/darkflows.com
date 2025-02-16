@@ -32,7 +32,7 @@ export default function DeletePost({ postId }: DeletePostProps) {
         throw new Error(data.message || 'Failed to delete post');
       }
 
-      router.push('/blog');
+      router.push('/admin/posts');
       router.refresh();
     } catch (error) {
       console.error('Error deleting post:', error);

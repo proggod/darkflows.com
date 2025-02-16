@@ -32,14 +32,6 @@ interface BlogPostProps {
 export default function BlogPost({ post }: BlogPostProps) {
   const [toc, setToc] = useState<TableOfContentsItem[]>([]);
 
-  console.log('Post content:', {
-    raw: post.content,
-    parsed: typeof post.content === 'string' ? JSON.parse(post.content) : post.content,
-    isString: typeof post.content === 'string',
-    length: post.content.length,
-    hasImage: post.content.includes('image')
-  });
-
   useEffect(() => {
     if (post?.content) {
       const parser = new DOMParser();

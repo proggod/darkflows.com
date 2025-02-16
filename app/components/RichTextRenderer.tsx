@@ -10,16 +10,31 @@ import rust from 'highlight.js/lib/languages/rust';
 import java from 'highlight.js/lib/languages/java';
 import c from 'highlight.js/lib/languages/c';
 import cpp from 'highlight.js/lib/languages/cpp';
+import shell from 'highlight.js/lib/languages/shell';
+import plaintext from 'highlight.js/lib/languages/plaintext';
 import 'highlight.js/styles/github-dark.css';
+
+interface Mark {
+  type: string;
+  attrs?: {
+    href?: string;
+    target?: string;
+    class?: string;
+  };
+}
 
 interface Node {
   type: string;
+  text?: string;
+  marks?: Mark[];
   content?: Array<{
     type: string;
     text?: string;
+    marks?: Mark[];
     content?: Array<{
       type: string;
       text?: string;
+      marks?: Mark[];
     }>;
     attrs?: {
       language?: string;
@@ -58,6 +73,8 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
     hljs.registerLanguage('go', go);
     hljs.registerLanguage('rust', rust);
     hljs.registerLanguage('java', java);
+    hljs.registerLanguage('shell', shell);
+    hljs.registerLanguage('plaintext', plaintext);
   }, []);
 
   // Add copy handler
@@ -85,7 +102,7 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
     });
   }, [html]);
 
-  // Modify the code block HTML generation
+  // Keep the wrapWithCopyButton helper
   const wrapWithCopyButton = (codeHtml: string) => `
     <div class="code-block-wrapper relative">
       <div class="absolute right-2 top-2 flex items-center gap-2">
@@ -122,94 +139,75 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
             );
             break;
           case 'blockquote':
-            let blockquoteContent = '';
-            node.content?.forEach(innerNode => {
-              if (innerNode.type === 'codeBlock') {
-                const code = innerNode.content?.[0]?.text || '';
-                const highlighted = hljs.highlight(code, {
-                  language: innerNode.attrs?.language || 'typescript'
-                }).value;
-                blockquoteContent += wrapWithCopyButton(
-                  `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`
-                );
-              }
-            });
-            processedHtml += `<blockquote>${blockquoteContent}</blockquote>`;
+            const rawText = node.content?.map(innerNode => 
+              innerNode.content?.[0]?.text || ''
+            ).filter(Boolean).join('\n');
+            
+            processedHtml += wrapWithCopyButton(
+              `<pre class="hljs"><code class="language-shell">${rawText}</code></pre>`
+            );
             break;
           case 'paragraph':
-            processedHtml += `<p>${node.content?.[0]?.text || ''}</p>`;
+            const paragraphContent = node.content?.[0]?.text || '';
+            processedHtml += `<p>${paragraphContent}</p>`;
             break;
           case 'heading':
             processedHtml += `<h1>${node.content?.[0]?.text || ''}</h1>`;
             break;
           default:
-            // Silently skip unhandled node types
             break;
         }
       });
 
       setHtml(processedHtml);
-    } catch {
+    } catch (error) {
       setHtml(content);
     }
   }, [content]);
-{/*
-  // Generate sample HTML for test section
-  const sampleCode = `// Sample TypeScript code
-function hello(name: string): string {
-  return \`Hello \${name}!\`;  // String template
-}`;
 
-  const sampleHtml = `
-    <pre class="hljs"><code class="language-typescript">${
-      hljs.highlight(sampleCode, {
-        language: 'typescript'
-      }).value
-    }</code></pre>
-  `;
-*/}
+  // Update the languages config and force highlight all code blocks
+  useEffect(() => {
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+      languages: [
+        'typescript', 
+        'javascript', 
+        'python', 
+        'ruby', 
+        'go', 
+        'rust', 
+        'java', 
+        'bash', 
+        'json', 
+        'html', 
+        'css',
+        'shell',
+        'plaintext'
+      ]
+    });
+    
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block as HTMLElement);
+    });
+  }, [content]);
+
   return (
-    <>
-      {/* Real content */}
-      <div 
-        className="prose prose-invert max-w-none w-full mb-8
-          [&_pre]:!bg-[#0d1117]
-          [&_pre]:!p-4
-          [&_pre]:!rounded-lg
-          [&_pre]:!text-xs
-          [&_pre]:!leading-relaxed
-          [&_pre]:!overflow-x-auto
-          [&_pre_code]:!p-0
-          [&_pre_code]:!font-mono
-          [&_pre_code]:!text-xs"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-
-      {/* Test section - uncomment for testing
-      <div className="border-t border-gray-800 pt-8 mt-8">
-        <h2 className="text-xl font-bold mb-4">Test Section</h2>
-        <div 
-          className="prose prose-invert max-w-none w-full
-            [&_pre]:!bg-[#0d1117]
-            [&_pre]:!p-4
-            [&_pre]:!rounded-lg
-            [&_pre]:!text-sm
-            [&_pre]:!leading-relaxed
-            [&_pre]:!overflow-x-auto
-            [&_pre_code]:!p-0
-            [&_pre_code]:!font-mono
-            [&_pre_code]:!text-sm
-            [&_.hljs-comment]:!text-[#8b949e]
-            [&_.hljs-keyword]:!text-[#ff7b72]
-            [&_.hljs-string]:!text-[#a5d6ff]
-            [&_.hljs-number]:!text-[#79c0ff]
-            [&_.hljs-title]:!text-[#d2a8ff]
-            [&_.hljs-params]:!text-[#e1e4e8]
-            [&_.hljs-type]:!text-[#ffa657]"
-          dangerouslySetInnerHTML={{ __html: sampleHtml }}
-        />
-      </div>
-      */}
-    </>
+    <div 
+      className="prose prose-invert max-w-none w-full mb-8
+        [&_pre]:!bg-[#0d1117]
+        [&_pre]:!p-4
+        [&_pre]:!rounded-lg
+        [&_pre]:!text-xs
+        [&_pre]:!leading-relaxed
+        [&_pre]:!overflow-x-auto
+        [&_pre_code]:!p-0
+        [&_pre_code]:!font-mono
+        [&_pre_code]:!text-xs
+        [&_blockquote]:!before:!content-['']
+        [&_blockquote]:!after:!content-['']
+        [&_blockquote]:!quotes-none
+        [&_blockquote]:!not-italic"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 } 

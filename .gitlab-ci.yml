@@ -5,9 +5,7 @@ services:
     alias: docker
 
 variables:
-  # Use Docker socket instead of TCP
-  DOCKER_HOST: ""
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS
   DOCKER_DRIVER: overlay2
   DOCKER_BUILDKIT: 1
   DOCKER_CLI_EXPERIMENTAL: enabled
@@ -30,8 +28,10 @@ before_script:
     RESET_PASSWORD=${RESET_PASSWORD}
     NEXT_PUBLIC_APP_URL=https://darkflows.com
     EOF
-  # Set up buildx
-  - docker buildx create --name mybuilder --use
+  # Set up buildx with TLS
+  - mkdir -p $DOCKER_TLS_CERTDIR/client
+  - docker context create builder
+  - docker buildx create --name mybuilder --use builder
 
 build:
   stage: build

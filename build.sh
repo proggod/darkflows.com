@@ -50,4 +50,4 @@ echo "✅ Build complete!"
 # echo "Verifying container environment:"
 # docker exec darkflows printenv | grep JWT_SECRET
 
-export JWT_SECRET="gfgd09809fd8g90dfg8df09g8gdf098g098" 
+# export JWT_SECRET="gfgd09809fd8g90dfg8df09g8gdf098g098" 

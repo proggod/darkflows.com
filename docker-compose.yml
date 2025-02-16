@@ -10,7 +10,7 @@ services:
       - "3050:3050"
     environment:
       - NODE_ENV=production
-      - JWT_SECRET=gfgd09809fd8g90dfg8df09g8gdf098g098
+      - JWT_SECRET=${JWT_SECRET}
       - NEXT_TELEMETRY_DISABLED=1
     restart: unless-stopped
     depends_on:

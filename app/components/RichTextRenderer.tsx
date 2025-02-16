@@ -13,6 +13,7 @@ import cpp from 'highlight.js/lib/languages/cpp';
 import shell from 'highlight.js/lib/languages/shell';
 import plaintext from 'highlight.js/lib/languages/plaintext';
 import 'highlight.js/styles/github-dark.css';
+import { generateHeadingId } from '../utils/headingUtils';
 
 interface Mark {
   type: string;
@@ -48,6 +49,7 @@ interface Node {
     src?: string;
     alt?: string;
     title?: string;
+    level?: number;
   };
 }
 
@@ -121,13 +123,11 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
   // Parse and highlight content
   useEffect(() => {
     try {
-      console.log('Parsing content:', content);
-      const jsonContent = JSON.parse(content) as JsonContent;
-      console.log('Parsed JSON:', jsonContent);
+      const jsonContent = typeof content === 'string' ? JSON.parse(content) : content;
       let processedHtml = '';
+      const headingCounts: Record<string, number> = {};
       
-      jsonContent.content.forEach((node: Node, index: number) => {
-        console.log(`Processing node ${index}:`, node);
+      jsonContent.content.forEach((node: Node) => {
         switch (node.type) {
           case 'image':
             processedHtml += `<img src="${node.attrs?.src}" alt="${node.attrs?.alt || ''}" class="max-w-full rounded-lg" />`;
@@ -142,53 +142,59 @@ export default function RichTextRenderer({ content }: RichTextRendererProps) {
             );
             break;
           case 'blockquote':
-            console.log('Blockquote node:', node);
             const rawText = node.content?.map(innerNode => {
-              console.log('Processing innerNode:', innerNode);
               if (!innerNode.content) {
-                console.log('No content in innerNode');
                 return '';
               }
               return innerNode.content.map(contentNode => {
-                console.log('Processing contentNode:', contentNode);
                 if (contentNode.marks?.some(mark => mark.type === 'link')) {
                   const link = contentNode.marks.find(mark => mark.type === 'link');
-                  console.log('Found link:', link);
                   return `<a href="${link?.attrs?.href || ''}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300">${contentNode.text}</a>`;
                 }
                 return contentNode.text;
               }).join('');
             }).filter(Boolean).join('\n') || '';
             
-            console.log('Final rawText:', rawText);
-            
-            // Try escaping semicolons and other special characters
             const escapedText = rawText.replace(/;/g, '&#59;')
                                       .replace(/\|/g, '&#124;');
-            
-            console.log('Escaped text:', escapedText);
             
             processedHtml += wrapWithCopyButton(
               `<pre class="hljs"><code class="language-shell">${escapedText}</code></pre>`
             );
             break;
           case 'paragraph':
-            const paragraphContent = node.content?.[0]?.text || '';
+            const paragraphContent = node.content?.map(contentNode => {
+              // Check if the node has link marks
+              if (contentNode.marks?.some(mark => mark.type === 'link')) {
+                const link = contentNode.marks.find(mark => mark.type === 'link');
+                return `<a href="${link?.attrs?.href || ''}" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="text-blue-400 hover:text-blue-300"
+                >${contentNode.text}</a>`;
+              }
+              return contentNode.text;
+            }).join('') || '';
+            
             processedHtml += `<p>${paragraphContent}</p>`;
             break;
           case 'heading':
-            processedHtml += `<h1>${node.content?.[0]?.text || ''}</h1>`;
+            const level = node.attrs?.level || 1;
+            const text = node.content?.[0]?.text || '';
+            
+            headingCounts[text] = (headingCounts[text] || 0) + 1;
+            const id = generateHeadingId(text, headingCounts[text]);
+            
+            processedHtml += `<h${level} id="${id}">${text}</h${level}>`;
             break;
           default:
             break;
         }
       });
 
-      console.log('Final HTML:', processedHtml);
       setHtml(processedHtml);
     } catch (error) {
       console.error('Error parsing content:', error);
-      console.error('Content that caused error:', content);
       setHtml(content);
     }
   }, [content]);

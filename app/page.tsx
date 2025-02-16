@@ -7,7 +7,7 @@ import FAQ from '@/app/components/FAQ';
 import siteContent from '@/data/site-content.json';
 import { SiteContent } from '@/types';
 // import VideoTutorials from './components/VideoTutorials'
-//import FeaturedPost from '@/app/components/FeaturedPost';
+import FeaturedPost from '@/app/components/FeaturedPost';
 import SwirlingParticles from '@/app/components/SwirlingParticles';
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
       <SwirlingParticles />
       <div className="relative z-10 bg-transparent">
         <TopNavBar />
-        {/* <FeaturedPost /> */}
+        <FeaturedPost /> 
         <ScrollReveal data={content.hero} />
         <div className="space-y-2">
           {content.dataConnectSections.map((section, index) => (

@@ -112,9 +112,12 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
       }),
       Link.configure({
         openOnClick: false,
-        transformer: (url: string) => {
-          return url.replace(/^"(.*)"$/, '$1');
-        }
+        HTMLAttributes: {
+          class: 'text-blue-400 hover:text-blue-300 underline',
+          rel: 'noopener noreferrer',
+          target: '_blank'
+        },
+        validate: href => /^https?:\/\//.test(href),
       }),
     ],
     content: isMounted ? (() => {
@@ -183,27 +186,20 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         const formData = new FormData();
         formData.append('file', file);
 
-        console.log('Uploading file:', {
-          name: file.name,
-          size: file.size,
-          type: file.type
-        });
-
         const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
 
         if (!response.ok) {
-          const error = await response.text();
-          throw new Error(`Upload failed: ${error}`);
+          throw new Error('Upload failed');
         }
 
         const { url } = await response.json();
         editor?.chain().focus().setImage({ src: url }).run();
       } catch (error) {
         console.error('Upload error:', error);
-        alert(`Failed to upload image: ${error.message}`);
+        alert('Failed to upload image');
       } finally {
         setUploading(false);
       }
@@ -213,10 +209,39 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   }, [editor]);
 
   const setLink = useCallback(() => {
-    const url = window.prompt('Enter URL');
-    if (url && editor) {
-      editor.chain().focus().toggleLink({ href: url }).run();
+    const previousUrl = editor?.getAttributes('link').href;
+    const url = window.prompt('Enter URL', previousUrl);
+
+    // Cancel button or empty URL
+    if (url === null) {
+      return;
     }
+
+    // Remove link if URL is empty
+    if (url === '') {
+      editor?.chain().focus().unsetLink().run();
+      return;
+    }
+
+    // Validate URL
+    try {
+      new URL(url);
+    } catch {
+      alert('Please enter a valid URL (including http:// or https://)');
+      return;
+    }
+
+    // Update or add link
+    editor?.chain().focus().setLink({ 
+      href: url,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }).run();
+  }, [editor]);
+
+  // Add this helper function to check if text is selected
+  const hasTextSelection = useCallback(() => {
+    return editor?.state.selection.content().size > 0;
   }, [editor]);
 
   if (!isMounted || !editor) {
@@ -304,8 +329,15 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
           <button
             type="button"
             onClick={setLink}
-            className={`p-2 rounded ${editor.isActive('link') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Add Link"
+            disabled={!hasTextSelection()}
+            className={`p-2 rounded ${
+              editor?.isActive('link') 
+                ? 'bg-gray-700' 
+                : hasTextSelection() 
+                  ? 'hover:bg-gray-700' 
+                  : 'opacity-50 cursor-not-allowed'
+            }`}
+            title={hasTextSelection() ? 'Add Link' : 'Select text to add link'}
           >
             <Link2 size={16} />
           </button>

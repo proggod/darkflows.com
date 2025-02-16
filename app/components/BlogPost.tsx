@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 import RichTextRenderer from './RichTextRenderer';
+import { generateHeadingId } from '../utils/headingUtils';
 
 interface TableOfContentsItem {
   id: string;
   text: string;
   level: number;
+  key: string;
 }
 
 interface BlogPostProps {
@@ -34,20 +36,43 @@ export default function BlogPost({ post }: BlogPostProps) {
 
   useEffect(() => {
     if (post?.content) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(post.content, 'text/html');
-      const headings = doc.querySelectorAll('h1, h2, h3');
-      
-      const tocItems = Array.from(headings).map((heading) => {
-        const text = heading.textContent || '';
-        const id = text.toLowerCase().replace(/\s+/g, '-');
-        heading.id = id;
-        return { id, text, level: parseInt(heading.tagName[1]) };
-      });
+      try {
+        const contentJson = typeof post.content === 'string' 
+          ? JSON.parse(post.content) 
+          : post.content;
 
-      setToc(tocItems);
+        const tocItems: TableOfContentsItem[] = [];
+        const headingCounts: Record<string, number> = {};
+        
+        const processNode = (node: any) => {
+          if (node.type === 'heading' && node.attrs?.level) {
+            const text = node.content?.[0]?.text || '';
+            
+            // Use the same ID generation logic as RichTextRenderer
+            headingCounts[text] = (headingCounts[text] || 0) + 1;
+            const id = generateHeadingId(text, headingCounts[text]);
+            
+            tocItems.push({
+              id,
+              text,
+              level: node.attrs.level,
+              key: `toc-${id}` // Prefix with 'toc-' to ensure unique React keys
+            });
+          }
+          
+          if (node.content) {
+            node.content.forEach(processNode);
+          }
+        };
+
+        contentJson.content?.forEach(processNode);
+        setToc(tocItems);
+
+      } catch (error) {
+        console.error('Error generating table of contents:', error);
+      }
     }
-  }, [post?.content, post]);
+  }, [post?.content]);
 
   useEffect(() => {
     // Initialize syntax highlighting with specific options
@@ -63,15 +88,17 @@ export default function BlogPost({ post }: BlogPostProps) {
   }, [post.content]);
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const yOffset = -100;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth'
-      });
-    }
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      if (element) {
+        const yOffset = -100;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({
+          top: y,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   return (
@@ -121,7 +148,7 @@ export default function BlogPost({ post }: BlogPostProps) {
             <nav className="space-y-2">
               {toc.map((item) => (
                 <button
-                  key={item.id}
+                  key={item.key}
                   onClick={() => scrollToSection(item.id)}
                   className={`block text-left w-full text-gray-400 hover:text-white transition-colors ${
                     item.level === 2 ? 'pl-4' : item.level === 3 ? 'pl-8' : ''

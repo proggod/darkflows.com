@@ -28,13 +28,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as Blob;
     
-    console.log('Upload attempt:', {
-      fileSize: file?.size,
-      fileType: file?.type,
-      maxSize: 10 * 1024 * 1024, // 10MB in bytes
-      isOverLimit: file?.size > 10 * 1024 * 1024
-    });
-
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }

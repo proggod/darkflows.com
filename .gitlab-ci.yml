@@ -6,6 +6,7 @@ services:
     command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
 
 variables:
+  # This tells the job's Docker CLI to connect to the DinD service on "dind:2375".
   DOCKER_HOST: "tcp://dind:2375"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: "overlay2"

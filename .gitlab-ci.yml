@@ -3,16 +3,14 @@ image: docker:latest
 services:
   - name: docker:dind
     alias: docker
-    command: ["--dns=8.8.8.8"]  # Use Google's DNS
 
 variables:
-  DOCKER_TLS_CERTDIR: ""  # Disable TLS since we're using DinD
-  DOCKER_HOST: "tcp://docker:2376"
+  # Use Docker socket instead of TCP
+  DOCKER_HOST: ""
+  DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
-  # These are needed for buildx
   DOCKER_BUILDKIT: 1
   DOCKER_CLI_EXPERIMENTAL: enabled
-  FF_NETWORK_PER_BUILD: "true"  # Use a clean network for each job
 
 stages:
   - build
@@ -33,7 +31,7 @@ before_script:
     NEXT_PUBLIC_APP_URL=https://darkflows.com
     EOF
   # Set up buildx
-  - docker buildx create --use --driver docker-container
+  - docker buildx create --name mybuilder --use
 
 build:
   stage: build

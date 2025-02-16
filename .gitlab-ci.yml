@@ -19,8 +19,13 @@ build:
   before_script:
     - apk add --no-cache bash
   script:
-    - pwd
-    - ls -la
+    - apk add --no-cache drill
+    - echo "Testing DNS for 'dind':"
+    - drill dind
+    # If "dind" doesn't resolve, the job container isn't seeing the service container.
+    - docker version
+    - docker info
+    - docker ps
     - chmod +x build.sh  # Ensure the script is executable
     - bash ./build.sh
   only:

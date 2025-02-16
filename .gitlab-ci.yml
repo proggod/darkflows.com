@@ -22,7 +22,6 @@ build:
     - apk add --no-cache drill
     - echo "Testing DNS for 'dind':"
     - drill dind
-    - pwd # If "dind" doesn't resolve, the job container isn't seeing the service container.
     - docker version
     - docker info
     - docker ps

@@ -1,12 +1,16 @@
 image: docker:latest
 
 services:
-  - docker:dind
+  - name: docker:dind
+    alias: docker
 
 variables:
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""  # Disable TLS since we're using DinD
+  DOCKER_HOST: "tcp://docker:2376"
   DOCKER_DRIVER: overlay2
+  # These are needed for buildx
+  DOCKER_BUILDKIT: 1
+  DOCKER_CLI_EXPERIMENTAL: enabled
 
 stages:
   - build
@@ -26,6 +30,9 @@ before_script:
     RESET_PASSWORD=${RESET_PASSWORD}
     NEXT_PUBLIC_APP_URL=https://darkflows.com
     EOF
+  # Set up docker buildx
+  - docker context create builder-context
+  - docker buildx create --use builder-context
 
 build:
   stage: build

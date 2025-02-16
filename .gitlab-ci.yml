@@ -2,11 +2,11 @@ image: docker:24.0.7
 
 services:
   - name: docker:24.0.7-dind
-    alias: docker
+    alias: dind
     command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_HOST: "tcp://dind:2375"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: "overlay2"
 
@@ -29,6 +29,6 @@ build:
 notify:
   stage: notify
   script:
-    - 'curl -X POST "https://darkflows.com/deploy?token=${DEPLOY_TOKEN}"'
+    - curl -X POST "https://darkflows.com/deploy?token=${DEPLOY_TOKEN}"
   only:
     - main

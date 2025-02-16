@@ -19,6 +19,7 @@ build:
   before_script:
     - apk add --no-cache bash
   script:
+    - pwd
     - apk add --no-cache drill
     - echo "Testing DNS for 'dind':"
     - drill dind

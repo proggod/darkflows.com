@@ -4,11 +4,12 @@ stages:
 
 build:
   stage: build
+  before_script:
+    - apk add --no-cache bash
   script:
     - pwd
     - ls -la
-    - chmod +x ./build.sh
-    - ./build.sh
+    - bash ./build.sh
   only:
     - main
 

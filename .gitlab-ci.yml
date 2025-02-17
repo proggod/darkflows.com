@@ -18,7 +18,7 @@ stages:
 build:
   stage: build
   before_script:
-    - apk add --no-cache bash
+    - apk add --no-cache bash git
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
     - apk add --no-cache drill

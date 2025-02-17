@@ -15,24 +15,8 @@ export async function POST(request: NextRequest) {
     
     const { password } = await request.json();
     
-    console.log('Reset attempt:', {
-      timestamp: new Date().toISOString(),
-      hasPassword: !!password,
-      hasEnvPassword: !!process.env.RESET_PASSWORD,
-      passwordLength: password?.length || 0,
-      envPasswordLength: process.env.RESET_PASSWORD?.length || 0
-    });
-    
     if (password !== process.env.RESET_PASSWORD) {
-      console.warn('Reset password mismatch:', {
-        timestamp: new Date().toISOString(),
-        providedPassword: password,
-        expectedPassword: process.env.RESET_PASSWORD,
-        note: 'If these match but still fail, check for whitespace or encoding issues'
-      });
-      return NextResponse.json({ 
-        error: `Invalid password.\n\nExpected: "${process.env.RESET_PASSWORD}"\nReceived: "${password}"\n\nLength: ${process.env.RESET_PASSWORD?.length} vs ${password?.length}` 
-      }, { status: 403 });
+      return NextResponse.json({ error: 'Invalid password' }, { status: 403 });
     }
 
     // Delete all documents from all collections

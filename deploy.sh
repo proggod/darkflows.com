@@ -44,7 +44,13 @@ else
 fi
 
 # Verify required environment variables
-required_vars=("MONGODB_URI" "JWT_SECRET" "RESET_PASSWORD")
+required_vars=(
+    "MONGODB_URI" 
+    "JWT_SECRET" 
+    "RESET_PASSWORD"
+    "MONGO_INITDB_ROOT_USERNAME"
+    "MONGO_INITDB_ROOT_PASSWORD"
+)
 for var in "${required_vars[@]}"; do
     if [ -z "${!var}" ]; then
         echo "❌ Error: $var is not set in ${ENV_FILE}"
@@ -92,7 +98,7 @@ else
 fi
 
 echo "🔍 Verifying environment variables..."
-$DOCKER_COMPOSE -f ${COMPOSE_FILE} config | grep -E "JWT_SECRET|RESET_PASSWORD|MONGODB_URI" || {
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} config | grep -E "JWT_SECRET|RESET_PASSWORD|MONGODB_URI|MONGO_INITDB_ROOT" || {
     echo "❌ Error: Required environment variables are not properly set in docker-compose config"
     exit 1
 }

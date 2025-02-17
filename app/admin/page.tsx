@@ -9,6 +9,7 @@ import { Users, FileText, Tag, UserCheck } from 'lucide-react';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Post from '@/models/Post';
+import ChangePassword from '@/app/components/ChangePassword';
 
 const adminActions = [
   {
@@ -96,6 +97,11 @@ export default async function AdminPage() {
           <h3 className="text-lg font-medium mb-2">Pending Approvals</h3>
           <p className="text-3xl font-bold">{pendingApprovals || 0}</p>
         </div>
+      </div>
+
+      {/* Add the new Password Change section */}
+      <div className="mt-12 bg-gray-800 rounded-lg p-6">
+        <ChangePassword />
       </div>
     </div>
   );

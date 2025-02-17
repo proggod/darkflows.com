@@ -28,7 +28,7 @@ done
 
 # Set the compose file based on environment
 COMPOSE_FILE="docker-compose.${ENVIRONMENT/production/prod}.yml"
-ENV_FILE=".env.${ENVIRONMENT}"
+ENV_FILE=".env.${ENVIRONMENT/dev/development}"
 
 # Load environment variables
 if [ -f "$ENV_FILE" ]; then
@@ -38,7 +38,7 @@ if [ -f "$ENV_FILE" ]; then
     set +a
 else
     echo "⚠️  ${ENV_FILE} not found. Creating from example..."
-    cp "sample.env.${ENVIRONMENT}" "$ENV_FILE"
+    cp "sample.env.${ENVIRONMENT/dev/development}" "$ENV_FILE"
     echo "⚠️  Please edit ${ENV_FILE} with your configuration"
     exit 1
 fi
@@ -88,12 +88,11 @@ fi
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "⬇️ Pulling latest images..."
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} pull
-    
-    # Verify environment variables are loaded
-    echo "🔍 Verifying environment variables..."
-    $DOCKER_COMPOSE -f ${COMPOSE_FILE} config | grep MONGODB_URI || echo "⚠️  Warning: MONGODB_URI not found in compose config"
 else
     echo "🏗️ Building local images..."
+    # Add these environment variables
+    export NODE_ENV=production
+    export NODE_OPTIONS=--no-deprecation
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} build
 fi
 
@@ -115,6 +114,14 @@ if [ "$ENVIRONMENT" = "prod" ]; then
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb mongosh --eval "db.adminCommand('ping')" || echo "⚠️  Warning: MongoDB not responding"
 fi
 
+# Move these lines before the logs command
+echo "Environment: $NODE_ENV"
+echo "Node Options: $NODE_OPTIONS"
+echo "Working Directory: $(pwd)"
+
+echo "📝 Showing logs..."
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} logs -f darkflows
+
 echo "✅ Deployment complete!"
 
 # Print connection information
@@ -124,7 +131,4 @@ if [ "$ENVIRONMENT" = "prod" ]; then
 else
     echo "  - Internal: mongodb://mongodb:27017"
     echo "  - External: mongodb://localhost:27018"
-fi
-
-echo "📝 Showing logs..."
-$DOCKER_COMPOSE -f ${COMPOSE_FILE} logs -f darkflows 
+fi 

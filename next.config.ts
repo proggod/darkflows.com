@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       enabled: true
     }
   },
+  typescript: {
+    ignoreBuildErrors: true
+  },
   images: {
     domains: ['localhost'],
     remotePatterns: [

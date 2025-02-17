@@ -24,14 +24,15 @@ export const verifySession = cache(async () => {
     };
   }
 
-  if (process.env.NODE_ENV === 'development' || process.env.SKIP_AUTH === 'true') {
-    return {
-      id: 'dev-user',
-      email: 'dev@example.com',
-      role: 'admin',
-      approved: true
-    };
-  }
+  // Comment out or remove the development bypass
+  // if (process.env.NODE_ENV === 'development' || process.env.SKIP_AUTH === 'true') {
+  //   return {
+  //     id: 'dev-user',
+  //     email: 'dev@example.com',
+  //     role: 'admin',
+  //     approved: true
+  //   };
+  // }
 
   const token = await getSessionToken()
 

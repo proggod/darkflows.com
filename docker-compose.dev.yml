@@ -3,9 +3,9 @@ services:
     container_name: darkflows-dev
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
-        NODE_ENV: development
+        - NODE_ENV=production
     ports:
       - "3050:3050"
     env_file:
@@ -17,7 +17,8 @@ services:
       - ./public/uploads:/uploads
     environment:
       - MONGODB_URI=${MONGODB_URI}
-      - NODE_ENV=development
+      - NODE_ENV=production
+      - NODE_OPTIONS=--no-deprecation
       - PORT=3050
       - NEXT_TELEMETRY_DISABLED=1
       - JWT_SECRET=${JWT_SECRET}

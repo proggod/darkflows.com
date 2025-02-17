@@ -10,8 +10,9 @@ RUN npm install
 RUN apk add --no-cache curl python3 make g++
 
 # Set development environment
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--no-deprecation
 
 # The rest of the source code will be mounted as a volume
 CMD ["npm", "run", "dev"] 

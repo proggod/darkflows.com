@@ -5,7 +5,9 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    serverActions: true,
+    serverActions: {
+      enabled: true
+    }
   },
   typescript: {
     ignoreBuildErrors: true, // Only during build time

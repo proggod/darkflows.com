@@ -19,7 +19,7 @@ ENVIRONMENT="dev"
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -p|--prod) ENVIRONMENT="prod" ;;
+        -p|--prod) ENVIRONMENT="production" ;;
         -d|--dev) ENVIRONMENT="dev" ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
@@ -27,24 +27,32 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Set the compose file based on environment
-COMPOSE_FILE="docker-compose.${ENVIRONMENT}.yml"
+COMPOSE_FILE="docker-compose.${ENVIRONMENT/production/prod}.yml"
 ENV_FILE=".env.${ENVIRONMENT}"
 
-echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
-
-# Check for environment file and verify MONGODB_URI
-if [ ! -f "$ENV_FILE" ]; then
+# Load environment variables
+if [ -f "$ENV_FILE" ]; then
+    echo "📝 Loading environment variables from ${ENV_FILE}"
+    set -a # automatically export all variables
+    source "$ENV_FILE"
+    set +a
+else
     echo "⚠️  ${ENV_FILE} not found. Creating from example..."
     cp "sample.env.${ENVIRONMENT}" "$ENV_FILE"
+    echo "⚠️  Please edit ${ENV_FILE} with your configuration"
+    exit 1
 fi
 
-# Verify MONGODB_URI in env file
-if [ "$ENVIRONMENT" = "prod" ]; then
-    if ! grep -q "MONGODB_URI=" "$ENV_FILE"; then
-        echo "⚠️  MONGODB_URI not found in ${ENV_FILE}"
-        echo "MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin" >> "$ENV_FILE"
+# Verify required environment variables
+required_vars=("MONGODB_URI" "JWT_SECRET" "RESET_PASSWORD")
+for var in "${required_vars[@]}"; do
+    if [ -z "${!var}" ]; then
+        echo "❌ Error: $var is not set in ${ENV_FILE}"
+        exit 1
     fi
-fi
+done
+
+echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
 
 echo "🛑 Stopping existing containers..."
 $DOCKER_COMPOSE -f ${COMPOSE_FILE} down
@@ -82,6 +90,12 @@ else
     echo "🏗️ Building local images..."
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} build
 fi
+
+echo "🔍 Verifying environment variables..."
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} config | grep -E "JWT_SECRET|RESET_PASSWORD|MONGODB_URI" || {
+    echo "❌ Error: Required environment variables are not properly set in docker-compose config"
+    exit 1
+}
 
 echo "🚀 Starting containers..."
 $DOCKER_COMPOSE -f ${COMPOSE_FILE} up -d

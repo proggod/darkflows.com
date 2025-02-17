@@ -27,7 +27,7 @@ services:
     tty: true
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
+      - MONGODB_URI=${MONGODB_URI}
       - JWT_SECRET=${JWT_SECRET}
       - RESET_PASSWORD=${RESET_PASSWORD}
       - NEXT_PUBLIC_APP_URL=https://darkflows.com
@@ -37,8 +37,8 @@ services:
     container_name: mongodb
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=darkflows
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - /var/www/darkflows.com/data/db:/data/db
     networks:

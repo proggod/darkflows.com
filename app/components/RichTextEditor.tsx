@@ -352,25 +352,26 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         </div>
         <EditorContent editor={editor} />
       </div>
+      {process.env.NODE_ENV === 'development' && (
+        <div className="space-y-4 text-sm">
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-bold mb-2">Debug Info:</h3>
+            <div>isMounted: {String(isMounted)}</div>
+            <div>Editor Active: {String(!!editor)}</div>
+            <div>Can Edit: {String(editor?.isEditable)}</div>
+          </div>
 
-      <div className="space-y-4 text-sm">
-        <div className="p-4 bg-gray-800 rounded-lg">
-          <h3 className="font-bold mb-2">Debug Info:</h3>
-          <div>isMounted: {String(isMounted)}</div>
-          <div>Editor Active: {String(!!editor)}</div>
-          <div>Can Edit: {String(editor?.isEditable)}</div>
-        </div>
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-bold mb-2">Current HTML:</h3>
+            <pre className="whitespace-pre-wrap break-all">{debugHtml}</pre>
+          </div>
 
-        <div className="p-4 bg-gray-800 rounded-lg">
-          <h3 className="font-bold mb-2">Current HTML:</h3>
-          <pre className="whitespace-pre-wrap break-all">{debugHtml}</pre>
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-bold mb-2">Editor JSON:</h3>
+            <pre className="whitespace-pre-wrap">{debugContent}</pre>
+          </div>
         </div>
-
-        <div className="p-4 bg-gray-800 rounded-lg">
-          <h3 className="font-bold mb-2">Editor JSON:</h3>
-          <pre className="whitespace-pre-wrap">{debugContent}</pre>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

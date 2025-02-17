@@ -78,6 +78,7 @@ export async function setSessionCookie(token: string) {
     maxAge: 60 * 60 * 24 * 7 // 7 days
   };
 
-  // Set the cookie
-  cookies().set(cookieOptions);
+  // Fix: await the cookies() Promise
+  const cookieStore = await cookies();
+  cookieStore.set(cookieOptions);
 } 

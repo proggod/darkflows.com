@@ -29,10 +29,18 @@ ENV_FILE=".env.${ENVIRONMENT}"
 
 echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
 
-# Check for environment file
+# Check for environment file and verify MONGODB_URI
 if [ ! -f "$ENV_FILE" ]; then
     echo "⚠️  ${ENV_FILE} not found. Creating from example..."
     cp "sample.env.${ENVIRONMENT}" "$ENV_FILE"
+fi
+
+# Verify MONGODB_URI in env file
+if [ "$ENVIRONMENT" = "prod" ]; then
+    if ! grep -q "MONGODB_URI=" "$ENV_FILE"; then
+        echo "⚠️  MONGODB_URI not found in ${ENV_FILE}"
+        echo "MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin" >> "$ENV_FILE"
+    fi
 fi
 
 echo "🛑 Stopping existing containers..."
@@ -63,6 +71,10 @@ fi
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "⬇️ Pulling latest images..."
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} pull
+    
+    # Verify environment variables are loaded
+    echo "🔍 Verifying environment variables..."
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} config | grep MONGODB_URI || echo "⚠️  Warning: MONGODB_URI not found in compose config"
 else
     echo "🏗️ Building local images..."
     $DOCKER_COMPOSE -f ${COMPOSE_FILE} build
@@ -71,8 +83,14 @@ fi
 echo "🚀 Starting containers..."
 $DOCKER_COMPOSE -f ${COMPOSE_FILE} up -d
 
-echo "⏳ Waiting for services to be ready..."
-sleep 10
+echo "⏳ Waiting for MongoDB to be ready..."
+sleep 15
+
+# Verify MongoDB connection
+if [ "$ENVIRONMENT" = "prod" ]; then
+    echo "🔌 Verifying MongoDB connection..."
+    $DOCKER_COMPOSE -f ${COMPOSE_FILE} exec -T mongodb mongosh --eval "db.adminCommand('ping')" || echo "⚠️  Warning: MongoDB not responding"
+fi
 
 echo "✅ Deployment complete!"
 
@@ -80,7 +98,6 @@ echo "✅ Deployment complete!"
 echo "🔌 MongoDB is available at:"
 if [ "$ENVIRONMENT" = "prod" ]; then
     echo "  - Internal: mongodb://mongodb:27017"
-    echo "  - External: mongodb://localhost:27018"
 else
     echo "  - Internal: mongodb://mongodb:27017"
     echo "  - External: mongodb://localhost:27018"

@@ -27,7 +27,7 @@ services:
     tty: true
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_URI=mongodb://admin:darkflows@mongodb:27017/darkflows?authSource=admin
       - JWT_SECRET=${JWT_SECRET}
       - RESET_PASSWORD=${RESET_PASSWORD}
       - NEXT_PUBLIC_APP_URL=https://darkflows.com

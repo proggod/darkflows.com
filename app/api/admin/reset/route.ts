@@ -10,7 +10,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Reset not available during build' }, { status: 503 });
   }
 
+  if (!process.env.MONGODB_URI) {
+    console.error('MongoDB URI is not defined in environment variables');
+    return NextResponse.json(
+      { error: 'Database configuration error' },
+      { status: 500 }
+    );
+  }
+
   try {
+    console.log('Attempting to connect to MongoDB...');
     await connectDB();
     
     const { password } = await request.json();

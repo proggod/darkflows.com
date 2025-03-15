@@ -1,0 +1,36 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.darkflows.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.darkflows.com'
+        gitlab_rails['gitlab_shell_ssh_port'] = 1022
+        nginx['redirect_http_to_https'] = true
+        nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab.darkflows.com/fullchain.pem"
+        nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab.darkflows.com/privkey.pem"
+    ports:
+      - '1080:80'
+      - '1443:443'
+      - '1022:22'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+      - '/etc/letsencrypt:/etc/letsencrypt:ro'  # Mount SSL certificates as read-only
+    shm_size: '256m'
+    networks:
+      gitlab_network:
+        ipv4_address: 172.25.0.10
+
+networks:
+  gitlab_network:
+    name: "gitlab_network"
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+

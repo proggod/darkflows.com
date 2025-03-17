@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DarkFlows Router OS",
+  title: "DarkFlows RouterOS",
   description: "Higher Performance Routing and Firewall Software OS",
   icons: {
     icon: [

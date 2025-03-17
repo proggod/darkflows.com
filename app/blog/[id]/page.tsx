@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/format';
 import type { Document, FlattenMaps } from 'mongoose';
 import mongoose from 'mongoose';
 import { initDatabase } from '@/lib/db/init';
+import { Metadata } from 'next';
 
 interface _PostDocument {
   _id: string;
@@ -50,13 +51,53 @@ interface PostDocument extends FlattenMaps<Document> {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
+}
+
+// Update the metadata generation function signature
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  const id = params.id;
+  
+  try {
+    await initDatabase();
+    await connectDB();
+    const post = await Post.findById(id)
+      .populate('author', 'name email')
+      .lean() as PostDocument;
+
+    if (!post) {
+      return {
+        title: 'Post Not Found',
+        description: 'The requested blog post could not be found'
+      };
+    }
+
+    return {
+      title: post.title,
+      description: post.content.substring(0, 160) + '...',
+      openGraph: {
+        title: post.title,
+        description: post.content.substring(0, 160) + '...',
+        type: 'article',
+        ...(post.coverImage && {
+          images: [{ url: post.coverImage }],
+        }),
+      },
+    };
+  } catch {
+    return {
+      title: 'Error',
+      description: 'There was an error loading this post'
+    };
+  }
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { id } = await params;
+  const id = params.id;
   
   try {
     await initDatabase();

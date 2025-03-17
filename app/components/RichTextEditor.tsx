@@ -68,8 +68,6 @@ interface RichTextEditorProps {
 export default function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [debugContent, setDebugContent] = useState('');
-  const [debugHtml, setDebugHtml] = useState('');
   
   useEffect(() => {
     setIsMounted(true);
@@ -144,16 +142,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     },
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
-      console.log('Editor update:', {
-        json,
-        html: editor.getHTML(),
-        text: editor.getText()
-      });
       onChange(JSON.stringify(json));
-      
-      // For debugging only
-      setDebugHtml(editor.getHTML());
-      setDebugContent(JSON.stringify(json, null, 2));
     },
     immediatelyRender: false
   });
@@ -255,123 +244,109 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   return (
     <div className="space-y-4">
       <div className="border border-gray-700 rounded-md bg-gray-800">
-        <div className="border-b border-gray-700 p-2 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 rounded ${editor.isActive('bold') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Bold"
-          >
-            <Bold size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 rounded ${editor.isActive('italic') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Italic"
-          >
-            <Italic size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`p-2 rounded ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Heading 1"
-          >
-            H1
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`p-2 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Heading 2"
-          >
-            H2
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`p-2 rounded ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Heading 3"
-          >
-            H3
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded ${editor.isActive('bulletList') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Bullet List"
-          >
-            <List size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={`p-2 rounded ${editor.isActive('codeBlock') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Code Block"
-          >
-            <Code size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={addImage}
-            className="p-2 rounded hover:bg-gray-700 relative"
-            title="Add Image"
-            disabled={uploading}
-          >
-            <ImageIcon size={16} className={uploading ? 'opacity-50' : ''} />
-            {uploading && (
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 px-2 py-1 rounded text-xs whitespace-nowrap">
-                Uploading...
-              </div>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={setLink}
-            disabled={!hasTextSelection()}
-            className={`p-2 rounded ${
-              editor?.isActive('link') 
-                ? 'bg-gray-700' 
-                : hasTextSelection() 
-                  ? 'hover:bg-gray-700' 
-                  : 'opacity-50 cursor-not-allowed'
-            }`}
-            title={hasTextSelection() ? 'Add Link' : 'Select text to add link'}
-          >
-            <Link2 size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded ${editor.isActive('blockquote') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            title="Quote"
-          >
-            <Quote size={16} />
-          </button>
+        <div className="fixed top-12 left-0 right-0 z-50 border-b border-gray-700 bg-[#111111]/95 backdrop-blur supports-[backdrop-filter]:bg-[#111111]/60">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="flex flex-wrap items-center justify-center gap-2 h-8">
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                className={`p-1 rounded ${editor.isActive('bold') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Bold"
+              >
+                <Bold size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                className={`p-1 rounded ${editor.isActive('italic') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Italic"
+              >
+                <Italic size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                className={`p-1 rounded ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Heading 1"
+              >
+                H1
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                className={`p-1 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Heading 2"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                className={`p-1 rounded ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Heading 3"
+              >
+                H3
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                className={`p-1 rounded ${editor.isActive('bulletList') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Bullet List"
+              >
+                <List size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                className={`p-1 rounded ${editor.isActive('codeBlock') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Code Block"
+              >
+                <Code size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={addImage}
+                className="p-1 rounded hover:bg-gray-700 relative"
+                title="Add Image"
+                disabled={uploading}
+              >
+                <ImageIcon size={14} className={uploading ? 'opacity-50' : ''} />
+                {uploading && (
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 px-2 py-1 rounded text-xs whitespace-nowrap">
+                    Uploading...
+                  </div>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={setLink}
+                disabled={!hasTextSelection()}
+                className={`p-1 rounded ${
+                  editor?.isActive('link') 
+                    ? 'bg-gray-700' 
+                    : hasTextSelection() 
+                      ? 'hover:bg-gray-700' 
+                      : 'opacity-50 cursor-not-allowed'
+                }`}
+                title={hasTextSelection() ? 'Add Link' : 'Select text to add link'}
+              >
+                <Link2 size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                className={`p-1 rounded ${editor.isActive('blockquote') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Quote"
+              >
+                <Quote size={14} />
+              </button>
+            </div>
+          </div>
         </div>
-        <EditorContent editor={editor} />
+        <div className="mt-8">
+          <EditorContent editor={editor} />
+        </div>
       </div>
-      {process.env.NODE_ENV === 'development' && (
-        <div className="space-y-4 text-sm">
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <h3 className="font-bold mb-2">Debug Info:</h3>
-            <div>isMounted: {String(isMounted)}</div>
-            <div>Editor Active: {String(!!editor)}</div>
-            <div>Can Edit: {String(editor?.isEditable)}</div>
-          </div>
-
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <h3 className="font-bold mb-2">Current HTML:</h3>
-            <pre className="whitespace-pre-wrap break-all">{debugHtml}</pre>
-          </div>
-
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <h3 className="font-bold mb-2">Editor JSON:</h3>
-            <pre className="whitespace-pre-wrap">{debugContent}</pre>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

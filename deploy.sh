@@ -28,7 +28,11 @@ done
 
 # Set the compose file based on environment
 COMPOSE_FILE="docker-compose.${ENVIRONMENT}.yml"
-ENV_FILE=".env.${ENVIRONMENT/dev/development}"
+if [ "$ENVIRONMENT" = "prod" ]; then
+    ENV_FILE=".env.production"
+else
+    ENV_FILE=".env.development"
+fi
 
 # Load environment variables
 if [ -f "$ENV_FILE" ]; then
@@ -37,8 +41,7 @@ if [ -f "$ENV_FILE" ]; then
     source "$ENV_FILE"
     set +a
 else
-    echo "⚠️  ${ENV_FILE} not found. Creating from example..."
-    cp "sample.env.${ENVIRONMENT/dev/development}" "$ENV_FILE"
+    echo "⚠️  ${ENV_FILE} not found. Please create it from sample.env.production or .env.production"
     echo "⚠️  Please edit ${ENV_FILE} with your configuration"
     exit 1
 fi

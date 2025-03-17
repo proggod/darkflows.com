@@ -64,7 +64,7 @@ done
 echo "🚀 Deploying in ${ENVIRONMENT} mode using ${COMPOSE_FILE}..."
 
 echo "🛑 Stopping existing containers..."
-$DOCKER_COMPOSE -f ${COMPOSE_FILE} down
+$DOCKER_COMPOSE -f ${COMPOSE_FILE} down --remove-orphans
 
 echo "🧹 Cleaning up..."
 # Modified to keep build cache

@@ -56,6 +56,28 @@ interface Props {
   };
 }
 
+function extractPlainText(content: string): string {
+  try {
+    const parsed = JSON.parse(content);
+    let text = '';
+    
+    const traverse = (node: any) => {
+      if (node.text) {
+        text += node.text + ' ';
+      }
+      if (node.content && Array.isArray(node.content)) {
+        node.content.forEach(traverse);
+      }
+    };
+
+    traverse(parsed);
+    return text.trim().substring(0, 160) + '...';
+  } catch {
+    // Fallback to basic string handling if content is not JSON
+    return content.substring(0, 160) + '...';
+  }
+}
+
 // Update the metadata generation function signature
 export async function generateMetadata(
   { params }: Props
@@ -76,12 +98,14 @@ export async function generateMetadata(
       };
     }
 
+    const plainTextDescription = extractPlainText(post.content);
+
     return {
       title: post.title,
-      description: post.content.substring(0, 160) + '...',
+      description: plainTextDescription,
       openGraph: {
         title: post.title,
-        description: post.content.substring(0, 160) + '...',
+        description: plainTextDescription,
         type: 'article',
         ...(post.coverImage && {
           images: [{ url: post.coverImage }],

@@ -1,0 +1,27 @@
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - /var/www/runner/data:/etc/gitlab-runner  # Mounts config to the main server
+      - /var/run/docker.sock:/var/run/docker.sock # <-- Add this (or /run/docker.sock:/var/run/docker.sock if needed)
+
+    environment:
+      - CI_SERVER_URL=https://gitlab.darkflows.com  # Change to your GitLab URL
+      - RUNNER_NAME=local-runner
+      - RUN_UNTAGGED=true
+      - EXECUTOR=docker
+      - DOCKER_IMAGE=node:18-alpine
+    networks:
+      gitlab_network:
+        # We can connect the runner container to the same network,
+        # but we do *not* need to assign its own static IP.
+        # We'll just override /etc/hosts for gitlab.darkflows.com → 172.19.0.10
+    extra_hosts:
+      - "gitlab.darkflows.com:172.25.0.10"
+
+networks:
+  gitlab_network:
+    external: true  # Tells Compose to use the already-created 'gitlab_network' from GitLab compose
+

@@ -19,7 +19,7 @@ ENVIRONMENT="dev"
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -p|--prod) ENVIRONMENT="production" ;;
+        -p|--prod) ENVIRONMENT="prod" ;;
         -d|--dev) ENVIRONMENT="dev" ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
@@ -27,7 +27,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Set the compose file based on environment
-COMPOSE_FILE="docker-compose.${ENVIRONMENT/production/prod}.yml"
+COMPOSE_FILE="docker-compose.${ENVIRONMENT}.yml"
 ENV_FILE=".env.${ENVIRONMENT/dev/development}"
 
 # Load environment variables

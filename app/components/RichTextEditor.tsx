@@ -231,7 +231,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 
   // Add this helper function to check if text is selected
   const hasTextSelection = useCallback(() => {
-    return editor?.state.selection.content().size > 0;
+    return editor?.state.selection.content().size ?? 0 > 0;
   }, [editor]);
 
   if (!isMounted || !editor) {
@@ -360,7 +360,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   );
 }
 
-function detectLanguage(code: string): typeof _SUPPORTED_LANGUAGES[number] {
+export function detectLanguage(code: string): typeof _SUPPORTED_LANGUAGES[number] {
   // Trim the code to remove whitespace
   const trimmedCode = code.trim();
   

@@ -132,6 +132,52 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
     </div>
   `;
 
+  // Add this helper function at the top level of the component
+  const processContent = (node: Node): string => {
+    switch (node.type) {
+      case 'paragraph':
+        const paragraphContent = node.content?.map(contentNode => {
+          if (contentNode.marks?.some(mark => mark.type === 'link')) {
+            const link = contentNode.marks.find(mark => mark.type === 'link');
+            return `<a href="${link?.attrs?.href || ''}" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="text-blue-400 hover:text-blue-300"
+            >${contentNode.text}</a>`;
+          }
+          return contentNode.text;
+        }).join('') || '';
+        return `<p>${paragraphContent}</p>`;
+      
+      case 'codeBlock':
+        const code = node.content?.[0]?.text || '';
+        const highlighted = hljs.highlight(code, {
+          language: 'typescript'
+        }).value;
+        return wrapWithCopyButton(
+          `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`
+        );
+      
+      case 'blockquote':
+        const rawText = node.content?.map(innerNode => {
+          if (!innerNode.content) return '';
+          return innerNode.content.map(contentNode => {
+            if (contentNode.marks?.some(mark => mark.type === 'link')) {
+              const link = contentNode.marks.find(mark => mark.type === 'link');
+              return `<a href="${link?.attrs?.href || ''}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300">${contentNode.text}</a>`;
+            }
+            return contentNode.text;
+          }).join('');
+        }).filter(Boolean).join('\n') || '';
+        
+        const escapedText = rawText.replace(/;/g, '&#59;').replace(/\|/g, '&#124;');
+        return `<blockquote>${escapedText}</blockquote>`;
+      
+      default:
+        return '';
+    }
+  };
+
   // Parse and highlight content
   useEffect(() => {
     try {
@@ -165,52 +211,6 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
               class="max-w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-200" 
               onclick="window.handleImageClick && window.handleImageClick('${node.attrs?.src}')" />`;
             break;
-          case 'codeBlock':
-            const code = node.content?.[0]?.text || '';
-            const highlighted = hljs.highlight(code, {
-              language: 'typescript'
-            }).value;
-            processedHtml += wrapWithCopyButton(
-              `<pre class="hljs"><code class="language-typescript">${highlighted}</code></pre>`
-            );
-            break;
-          case 'blockquote':
-            const rawText = node.content?.map(innerNode => {
-              if (!innerNode.content) {
-                return '';
-              }
-              return innerNode.content.map(contentNode => {
-                if (contentNode.marks?.some(mark => mark.type === 'link')) {
-                  const link = contentNode.marks.find(mark => mark.type === 'link');
-                  return `<a href="${link?.attrs?.href || ''}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300">${contentNode.text}</a>`;
-                }
-                return contentNode.text;
-              }).join('');
-            }).filter(Boolean).join('\n') || '';
-            
-            const escapedText = rawText.replace(/;/g, '&#59;')
-                                      .replace(/\|/g, '&#124;');
-            
-            processedHtml += wrapWithCopyButton(
-              `<pre class="hljs"><code class="language-shell">${escapedText}</code></pre>`
-            );
-            break;
-          case 'paragraph':
-            const paragraphContent = node.content?.map(contentNode => {
-              // Check if the node has link marks
-              if (contentNode.marks?.some(mark => mark.type === 'link')) {
-                const link = contentNode.marks.find(mark => mark.type === 'link');
-                return `<a href="${link?.attrs?.href || ''}" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  class="text-blue-400 hover:text-blue-300"
-                >${contentNode.text}</a>`;
-              }
-              return contentNode.text;
-            }).join('') || '';
-            
-            processedHtml += `<p>${paragraphContent}</p>`;
-            break;
           case 'heading':
             const level = node.attrs?.level || 1;
             const text = node.content?.[0]?.text || '';
@@ -222,29 +222,20 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
             break;
           case 'bulletList':
             const bulletItems = node.content?.map(item => {
-              const itemContent = item.content?.map(contentNode => {
-                if (contentNode.type === 'paragraph') {
-                  return contentNode.content?.map((textNode: TextNode) => textNode.text || '').join('') || '';
-                }
-                return '';
-              }).join('') || '';
+              const itemContent = item.content?.map(contentNode => processContent(contentNode)).join('') || '';
               return `<li>${itemContent}</li>`;
             }).join('') || '';
             processedHtml += `<ul>${bulletItems}</ul>`;
             break;
           case 'orderedList':
             const orderedItems = node.content?.map(item => {
-              const itemContent = item.content?.map(contentNode => {
-                if (contentNode.type === 'paragraph') {
-                  return contentNode.content?.map((textNode: TextNode) => textNode.text || '').join('') || '';
-                }
-                return '';
-              }).join('') || '';
+              const itemContent = item.content?.map(contentNode => processContent(contentNode)).join('') || '';
               return `<li>${itemContent}</li>`;
             }).join('') || '';
             processedHtml += `<ol>${orderedItems}</ol>`;
             break;
           default:
+            processedHtml += processContent(node);
             break;
         }
       });
@@ -307,7 +298,9 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
         [&_blockquote]:!before:!content-['']
         [&_blockquote]:!after:!content-['']
         [&_blockquote]:!quotes-none
-        [&_blockquote]:!not-italic"
+        [&_blockquote]:!not-italic
+        [&_li]:!my-2
+        [&_li_pre]:!my-2"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

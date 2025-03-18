@@ -50,12 +50,6 @@ interface PostDocument extends FlattenMaps<Document> {
   __v: number;
 }
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
 function extractPlainText(content: string): string {
   try {
     const parsed = JSON.parse(content);
@@ -80,9 +74,9 @@ function extractPlainText(content: string): string {
 
 // Update the metadata generation function signature
 export async function generateMetadata(
-  { params }: Props
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   
   try {
     await initDatabase();
@@ -120,8 +114,8 @@ export async function generateMetadata(
   }
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  const id = params.id;
+export default async function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   
   try {
     await initDatabase();

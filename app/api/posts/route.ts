@@ -9,16 +9,16 @@ import mongoose from 'mongoose';
 import { NextRequest } from 'next/server';
 
 interface PostDocument {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   title: string;
   content: string;
   author: {
-    _id: string;
+    _id: mongoose.Types.ObjectId;
     name: string;
     email: string;
   };
   category?: {
-    _id: string;
+    _id: mongoose.Types.ObjectId;
     name: string;
     slug: string;
   };
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     
     let query = {};
     if (category) {
-      const categoryDoc = await mongoose.model('Category').findOne({ name: category }).lean();
+      const categoryDoc = await mongoose.model('Category').findOne({ name: category }).lean() as { _id: mongoose.Types.ObjectId };
       if (categoryDoc) {
         query = { category: categoryDoc._id };
       }
@@ -46,15 +46,7 @@ export async function GET(request: NextRequest) {
       .populate('author', 'name email')
       .populate('category', 'name slug')
       .sort({ createdAt: -1 })
-      .lean() as unknown as Array<{
-        _id: { toString(): string };
-        title: string;
-        content: string;
-        author: { _id: { toString(): string }; name: string; email: string };
-        category?: { _id: { toString(): string }; name: string; slug: string };
-        createdAt: Date;
-        updatedAt: Date;
-      }>;
+      .lean() as unknown as PostDocument[];
 
     // Serialize the MongoDB documents
     const serializedPosts = posts.map(post => ({
@@ -134,7 +126,7 @@ export async function POST(request: Request) {
         select: 'name email',
         model: 'User'
       })
-      .lean();
+      .lean() as unknown as PostDocument;
 
     console.log('Populated post:', {
       id: populatedPost?._id.toString(),
@@ -154,19 +146,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
-
-// Helper function to extract text from Tiptap JSON
-function extractTextFromJson(json: any): string {
-  if (!json.content) return '';
-  
-  return json.content.reduce((text: string, node: any) => {
-    if (node.type === 'text') {
-      return text + ' ' + node.text;
-    }
-    if (node.content) {
-      return text + ' ' + extractTextFromJson(node);
-    }
-    return text;
-  }, '').trim();
 } 

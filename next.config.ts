@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
+  transpilePackages: ["geist"],
   images: {
     domains: ['localhost'],
     remotePatterns: [

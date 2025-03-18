@@ -142,7 +142,8 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     },
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
-      onChange(JSON.stringify(json));
+      // Only stringify if it's not already a string
+      onChange(typeof json === 'string' ? json : JSON.stringify(json));
     },
     immediatelyRender: false
   });

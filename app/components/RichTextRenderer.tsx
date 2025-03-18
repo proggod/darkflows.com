@@ -124,7 +124,26 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
   // Parse and highlight content
   useEffect(() => {
     try {
-      const jsonContent = typeof content === 'string' ? JSON.parse(content) : content;
+      let jsonContent;
+      if (typeof content === 'string') {
+        // Remove backticks if they exist at the start and end
+        const cleanContent = content.replace(/^`|`$/g, '');
+        try {
+          jsonContent = JSON.parse(cleanContent);
+        } catch (parseError) {
+          console.error('First parse error:', parseError);
+          // If first parse fails, try parsing again (in case it was double stringified)
+          try {
+            jsonContent = JSON.parse(JSON.parse(cleanContent));
+          } catch (doubleParseError) {
+            console.error('Second parse error:', doubleParseError);
+            throw doubleParseError;
+          }
+        }
+      } else {
+        jsonContent = content;
+      }
+      
       let processedHtml = '';
       const headingCounts: Record<string, number> = {};
       

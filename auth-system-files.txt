@@ -1,0 +1,86 @@
+AUTHENTICATION SYSTEM FILES AND FLOW
+
+1. Core Authentication Files:
+/app/actions/auth.ts
+- Server actions for login/logout
+- Session verification
+- Cookie management
+- JWT token handling
+
+/lib/session.ts
+- Session token management
+- Session verification logic
+- Cookie helper functions
+
+/middleware.ts
+- Route protection
+- JWT verification
+- Protected paths configuration
+
+2. API Routes:
+/app/api/auth/login/route.ts
+- Handles login requests
+- Validates credentials
+- Creates JWT tokens
+- Sets session cookies
+
+/app/api/auth/logout/route.ts
+- Handles logout
+- Clears session cookies
+
+/app/api/auth/register/route.ts
+- User registration
+- First user auto-admin
+- Password hashing
+- Auto-login for first user
+
+3. Pages:
+/app/login/page.tsx
+- Login form UI
+- Error handling
+- Redirect logic
+
+/app/register/page.tsx
+- Registration form
+- User creation
+- Success/error states
+
+/app/setup/page.tsx
+- First-time setup check
+- Admin account creation
+
+/app/setup/SetupForm.tsx
+- Setup form component
+- Initial admin registration
+
+4. Models:
+/models/User.ts
+- User schema
+- Password hashing
+- Role management
+- Approval status
+
+5. Layout Protection:
+/app/admin/layout.tsx
+- Admin route protection
+- Session verification
+- Setup check
+
+Authentication Flow:
+1. User attempts accessing /admin/*
+2. Middleware checks for valid session
+3. If no session, redirects to /login
+4. Login validates credentials
+5. Creates JWT token on success
+6. Sets HTTP-only cookie
+7. Redirects to admin dashboard
+
+Security Features:
+- JWT-based authentication
+- HTTP-only cookies
+- Password hashing with bcrypt
+- Protected routes
+- Role-based access
+- First user automation
+- Session verification
+- Secure cookie options 

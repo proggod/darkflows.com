@@ -7,7 +7,7 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Link from '@tiptap/extension-link';
 import { common, createLowlight } from 'lowlight';
 import { useEffect, useState, useCallback } from 'react';
-import { Bold, Italic, List, ImageIcon, Code, Link2, Quote } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, ImageIcon, Code, Link2, Quote } from 'lucide-react';
 import typescript from 'highlight.js/lib/languages/typescript';
 import javascript from 'highlight.js/lib/languages/javascript';
 import python from 'highlight.js/lib/languages/python';
@@ -295,6 +295,14 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
                 title="Bullet List"
               >
                 <List size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                className={`p-1 rounded ${editor.isActive('orderedList') ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+                title="Ordered List"
+              >
+                <ListOrdered size={14} />
               </button>
               <button
                 type="button"

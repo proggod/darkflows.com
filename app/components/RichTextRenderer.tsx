@@ -36,6 +36,11 @@ interface Node {
       type: string;
       text?: string;
       marks?: Mark[];
+      content?: Array<{
+        type: string;
+        text?: string;
+        marks?: Mark[];
+      }>;
     }>;
     attrs?: {
       language?: string;
@@ -51,6 +56,12 @@ interface Node {
     title?: string;
     level?: number;
   };
+}
+
+interface TextNode {
+  type: string;
+  text?: string;
+  marks?: Mark[];
 }
 
 interface JsonContent {
@@ -208,6 +219,30 @@ export default function RichTextRenderer({ content, onImageClick }: RichTextRend
             const id = generateHeadingId(text, headingCounts[text]);
             
             processedHtml += `<h${level} id="${id}">${text}</h${level}>`;
+            break;
+          case 'bulletList':
+            const bulletItems = node.content?.map(item => {
+              const itemContent = item.content?.map(contentNode => {
+                if (contentNode.type === 'paragraph') {
+                  return contentNode.content?.map((textNode: TextNode) => textNode.text || '').join('') || '';
+                }
+                return '';
+              }).join('') || '';
+              return `<li>${itemContent}</li>`;
+            }).join('') || '';
+            processedHtml += `<ul>${bulletItems}</ul>`;
+            break;
+          case 'orderedList':
+            const orderedItems = node.content?.map(item => {
+              const itemContent = item.content?.map(contentNode => {
+                if (contentNode.type === 'paragraph') {
+                  return contentNode.content?.map((textNode: TextNode) => textNode.text || '').join('') || '';
+                }
+                return '';
+              }).join('') || '';
+              return `<li>${itemContent}</li>`;
+            }).join('') || '';
+            processedHtml += `<ol>${orderedItems}</ol>`;
             break;
           default:
             break;
